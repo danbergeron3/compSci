@@ -1,0 +1,3 @@
+{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file dependencies/bridges-cxx-install","time":"2022-11-06T17:40:29Z"}
+{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file dependencies/curl/lib/libcurl.so","time":"2022-11-06T17:40:29Z"}
+{"error":".zip archives do not support non-regular files","level":"error","msg":"unable to write file dependencies/curl/lib/libcurl.so.4","time":"2022-11-06T17:40:29Z"}
