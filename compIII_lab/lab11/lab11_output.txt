@@ -1,0 +1,61 @@
+Original - Contents of upDB:
+Sally Brown, 110 Canal Street, 12345678
+Jimmy Smith, 99 Canal Street, 87654321
+Mary Doe, 10 Maple Drive, 47100123
+John Doe, 10 Maple Drive, 69271023
+Howard Johnson, 20 Maple Drive, 89177224
+Jane Astor, 40 Birch Street, 34112316
+Jane Smith, 50 Birch Street, 60289502
+Hermione Granger, 55 Pine Avenue, 87654321
+Luke Skywalker, Tatooine, 51519030
+Leia Organa, Alderaan, 71590710
+
+After std::stable_sort with default comparison (by last name) - Contents of upDB:
+Jane Astor, 40 Birch Street, 34112316
+Sally Brown, 110 Canal Street, 12345678
+Mary Doe, 10 Maple Drive, 47100123
+John Doe, 10 Maple Drive, 69271023
+Hermione Granger, 55 Pine Avenue, 87654321
+Howard Johnson, 20 Maple Drive, 89177224
+Leia Organa, Alderaan, 71590710
+Luke Skywalker, Tatooine, 51519030
+Jimmy Smith, 99 Canal Street, 87654321
+Jane Smith, 50 Birch Street, 60289502
+
+After std::stable_sort using Compare function compare_IDs - Contents of upDB:
+Sally Brown, 110 Canal Street, 12345678
+Jane Astor, 40 Birch Street, 34112316
+Mary Doe, 10 Maple Drive, 47100123
+Luke Skywalker, Tatooine, 51519030
+Jane Smith, 50 Birch Street, 60289502
+John Doe, 10 Maple Drive, 69271023
+Leia Organa, Alderaan, 71590710
+Hermione Granger, 55 Pine Avenue, 87654321
+Jimmy Smith, 99 Canal Street, 87654321
+Howard Johnson, 20 Maple Drive, 89177224
+
+Using std::find:
+IDNumber 87654321 found in upDB for UMLPerson: Hermione Granger, 55 Pine Avenue, 87654321
+IDNumber 89283002 not found in upDB
+
+std::minmax_element in upDB using default comparison (by last name):
+min is Jane Astor, 40 Birch Street, 34112316
+max is Jimmy Smith, 99 Canal Street, 87654321
+
+std::minmax_element in upDB using Compare function compare_IDs:
+min is Sally Brown, 110 Canal Street, 12345678
+max is Howard Johnson, 20 Maple Drive, 89177224
+
+Using std::count, IDNumber 87654321 appears 2 times in upDB.
+
+Using std::for_each to print full name of each person in upDB:
+Sally Brown
+Jane Astor
+Mary Doe
+Luke Skywalker
+Jane Smith
+John Doe
+Leia Organa
+Hermione Granger
+Jimmy Smith
+Howard Johnson

@@ -1,0 +1,10 @@
+Sally Brown , 110 Canal Street, 12345678
+Jimmy Smith , 99 Canal Street, 87654321
+Mary Doe , 10 Maple Drive, 47100123
+John Doe , 10 Maple Drive, 69271023
+Howard Johnson , 20 Maple Drive, 89177224
+Jane Astor , 40 Birch Street, 34112316
+Jane Smith , 50 Birch Street, 60289502
+Hermione Granger , 55 Pine Avenue, 87654321
+Luke Skywalker , Tatooine, 51519030
+Leia Organa , Alderaan, 71590710
