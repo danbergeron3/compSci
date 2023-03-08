@@ -4,7 +4,7 @@ OBJ = Sokoban.o main.o
 LIBS = -lsfml-window -lsfml-graphics -lsfml-system
 DEPS = Sokoban.hpp
 
-all: Sokoban
+all: Sokoban lint
 
 Sokoban: $(OBJ)
 	$(CC) $(CFLAGS) -o Sokoban $(OBJ) $(LIBS) 

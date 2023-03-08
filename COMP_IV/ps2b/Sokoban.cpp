@@ -1,14 +1,11 @@
 /* "Copyright [2023] <Daniel Bergeron>" */
-#include "Sokoban.hpp"
+#include "ps2b/Sokoban.hpp"
 
 GameObject::GameObject(int _x, int _y, typeObject _object) {
     x = _x;
     y = _y;
     object = _object;
-}
-
-typeObject Sokoban::getTypeUnderAtPosition(pair<int, int> position) {
-    return matrix[position.second][position.first].getCurrTypeUnder();
+    currTypeUnder = _object;
 }
 
 void GameObject::setBlock(int _x, int _y, typeObject _object,
@@ -17,6 +14,8 @@ void GameObject::setBlock(int _x, int _y, typeObject _object,
     x = _x;
     y = _y;
     object = _object;
+    // gets texture from map of stored textures
+    // so no new textures are created.
     sprite.setTexture(texture[_object]);
 }
 
@@ -41,8 +40,21 @@ Sokoban::Sokoban() {
     playerLocation.second = 0;
 }
 
+// gets the pixels sizes of the the texture passed in
+void getTexturePixelSize(const sf::Texture& texture, pair<int, int>& cor) {
+    sf::Vector2u pixels;
+    pixels = texture.getSize();
+    cor.first = static_cast<int>(pixels.x);
+    cor.second = static_cast<int>(pixels.y);
+    return;
+}
+
+// functions takes move
+// checks for no move then
+// sets Sokobans move Objects then
+// it excuetes the commands within
+// the move objects
 void Sokoban::movePlayer(moveSet move) {
-    cout << move << endl;
     MoveObject moveInfo;
     if (move == noMove) {
         return;
@@ -53,8 +65,28 @@ void Sokoban::movePlayer(moveSet move) {
     return;
 }
 
+// returns the type under from anypoint in the matrix
+// importent for setting new blocks
+typeObject Sokoban::getTypeUnderAtPosition(pair<int, int> position) {
+    return matrix[position.second][position.first].getCurrTypeUnder();
+}
+
+// checks win condition
+// returns win/true when all
+// points of ben aquired by player
 const bool Sokoban::isWon(void) {
-    if (pointsToWin > 0) {
+    // std::count_if(v.begin(), v.end(), [](int i) { return i % 4 == 0; });
+    int points = 0;
+    std::for_each(matrix.begin(), matrix.end(),
+    [&](vector<GameObject> i) {
+        for (GameObject obj : i) {
+            if (obj.getTypeObject() == stored) {
+                points++;
+            }
+        }
+    });
+    // cout << "pointed scored score: " << points << endl;
+    if (pointsToWin > points) {
         return false;
     } else {
         return true;
@@ -66,54 +98,56 @@ void Sokoban::setMoveObjects(moveSet move) {
     GameObject nextBlock, nextCrateBlock;
     pair<int, int> previousLoc, newLoc;
     // see if player can move
-        // getSpace at move
+    // getSpace at move
+    nextPlayerMove.setMoveable(false);
+    nextBlockMove.setMoveable(false);
+    nextBlock = getNextSpace(move, playerLocation);
+
+    // no move if wall or object is in state stored
+    if (nextBlock.getTypeObject() == wall
+            || nextBlock.getTypeObject() == stored) {
         nextPlayerMove.setMoveable(false);
-        nextBlockMove.setMoveable(false);
-        nextBlock = getNextSpace(move, playerLocation);
-        // no move if wall
-        if (nextBlock.getTypeObject() == wall || nextBlock.getTypeObject() == stored) {
-            // cout << "is wall" << endl;
+        return;
+    // if next block is crate condition
+    } else if (nextBlock.getTypeObject() == crate) {
+        // checks to see if a crate is a moveable object
+        currentCrateLocation.first = nextBlock.getXlocation();
+        currentCrateLocation.second = nextBlock.getYlocation();
+        nextCrateBlock = getNextSpace(move, currentCrateLocation);
+        // if wall or another crate both player and crate can't move
+        if (nextCrateBlock.getTypeObject() == wall
+                || nextCrateBlock.getTypeObject() == crate) {
+            nextBlockMove.setMoveable(false);
             nextPlayerMove.setMoveable(false);
-            return;
-        } else if (nextBlock.getTypeObject() == crate) {
-            currentCrateLocation.first = nextBlock.getXlocation();
-            currentCrateLocation.second = nextBlock.getYlocation();
-            nextCrateBlock = getNextSpace(move, currentCrateLocation);
-            if (nextCrateBlock.getTypeObject() == wall
-                            || nextCrateBlock.getTypeObject() == crate) {
-                nextBlockMove.setMoveable(false);
-                nextPlayerMove.setMoveable(false);
-                // cout << "crate no move" << endl;
-            } else if (nextCrateBlock.getTypeObject() == storage_space
-                            || nextCrateBlock.getTypeObject() == floor) {
-                // set move player
-                nextPlayerMove.setMoveable(true);
-                nextPlayerMove.setCurrSpace(playerLocation);
-                newLoc.first = nextBlock.getXlocation();
-                newLoc.second = nextBlock.getYlocation();
-                nextPlayerMove.setNextSpace(newLoc);
+        } else if (nextCrateBlock.getTypeObject() == storage_space
+                    || nextCrateBlock.getTypeObject() == floor) {
+            // set move player
+            nextPlayerMove.setMoveable(true);
+            nextPlayerMove.setCurrSpace(playerLocation);
+            newLoc.first = nextBlock.getXlocation();
+            newLoc.second = nextBlock.getYlocation();
+            nextPlayerMove.setNextSpace(newLoc);
 
-                // set move block
-                nextBlockMove.setMoveable(true);
-                previousLoc.first = nextBlock.getXlocation();
-                previousLoc.second = nextBlock.getYlocation();
-                nextBlockMove.setCurrSpace(previousLoc);
-                newLoc.first = nextCrateBlock.getXlocation();
-                newLoc.second = nextCrateBlock.getYlocation();
-                nextBlockMove.setNextSpace(newLoc);
-                // cout << "crate can move" << endl;
-            }
-            return;
+            // set move block
+            nextBlockMove.setMoveable(true);
+            previousLoc.first = nextBlock.getXlocation();
+            previousLoc.second = nextBlock.getYlocation();
+            nextBlockMove.setCurrSpace(previousLoc);
+            newLoc.first = nextCrateBlock.getXlocation();
+            newLoc.second = nextCrateBlock.getYlocation();
+            nextBlockMove.setNextSpace(newLoc);
         }
-
-        nextPlayerMove.setMoveable(true);
-        nextPlayerMove.setCurrSpace(playerLocation);
-        newLoc.first = nextBlock.getXlocation();
-        newLoc.second = nextBlock.getYlocation();
-        nextPlayerMove.setNextSpace(newLoc);
-    return;
+        return;
+    }
+    // default condtion player is movable
+    nextPlayerMove.setMoveable(true);
+    nextPlayerMove.setCurrSpace(playerLocation);
+    newLoc.first = nextBlock.getXlocation();
+    newLoc.second = nextBlock.getYlocation();
+    nextPlayerMove.setNextSpace(newLoc);
 }
 
+// checks what game object is at the next space based of user input
 GameObject& Sokoban::getNextSpace(moveSet move, pair<int, int> CurrObjectLoc) {
     int nextX, nextY;
     nextX = CurrObjectLoc.first;
@@ -138,17 +172,21 @@ GameObject& Sokoban::getNextSpace(moveSet move, pair<int, int> CurrObjectLoc) {
     return matrix[nextY][nextX];
 }
 
+// function uses two moveObjects one to replace
+// the object on the space it is being moved from
+// i.e. the replace object, the other object is
+// the one being move to another location the moving
+// object, which retains its curr type but the type
+// under changes to that of the object which was
+// originaly there
 bool Sokoban::executeMoveObjects(void) {
-    // MoveObject nextPlayerMove
-    // MoveObject nextBlockMove
-    //
     GameObject replaceBlock, movingBlock;
     pair<int, int> oldPosition, newPosition;
-    if (nextPlayerMove.getMovable() == false && nextBlockMove.getMovable() == false) {
-        cout << "no move" << endl;
+    if (nextPlayerMove.getMovable() == false
+            && nextBlockMove.getMovable() == false) {
         return false;
-    } else if (nextPlayerMove.getMovable() == true && nextBlockMove.getMovable() == true) {
-        cout << "Both crate & player move\n";
+    } else if (nextPlayerMove.getMovable() == true
+                && nextBlockMove.getMovable() == true) {
         // move crate & updateMap;
         oldPosition = nextBlockMove.getCurrSpace();
         newPosition = nextBlockMove.getNextSpace();
@@ -156,17 +194,19 @@ bool Sokoban::executeMoveObjects(void) {
         if (getTypeUnderAtPosition(newPosition) == storage_space) {
             replaceBlock.setBlock(oldPosition.first, oldPosition.second,
                         getTypeUnderAtPosition(oldPosition), textureMap);
-
-            movingBlock.setBlock(newPosition.first, newPosition.second, stored, textureMap);
+            // set stored state on crate at new location
+            movingBlock.setBlock(newPosition.first,
+                        newPosition.second, stored, textureMap);
             movingBlock.setCurrTypeUnder(getTypeUnderAtPosition(newPosition));
             moveMatrixBlocks(replaceBlock, movingBlock);
-            pointsToWin--;
+            // pointsToWin--; 
         } else {
             replaceBlock.setBlock(oldPosition.first, oldPosition.second,
                     getTypeUnderAtPosition(oldPosition), textureMap);
             replaceBlock.setCurrTypeUnder(replaceBlock.getTypeObject());
 
-            movingBlock.setBlock(newPosition.first, newPosition.second, crate, textureMap);
+            movingBlock.setBlock(newPosition.first,
+                    newPosition.second, crate, textureMap);
             movingBlock.setCurrTypeUnder(getTypeUnderAtPosition(newPosition));
             moveMatrixBlocks(replaceBlock, movingBlock);
         }
@@ -174,23 +214,30 @@ bool Sokoban::executeMoveObjects(void) {
         oldPosition = nextPlayerMove.getCurrSpace();
         newPosition = nextPlayerMove.getNextSpace();
 
-        replaceBlock.setBlock(oldPosition.first, oldPosition.second, getTypeUnderAtPosition(oldPosition), textureMap);
+        replaceBlock.setBlock(oldPosition.first, oldPosition.second,
+                    getTypeUnderAtPosition(oldPosition), textureMap);
         replaceBlock.setCurrTypeUnder(replaceBlock.getTypeObject());
 
-        movingBlock.setBlock(newPosition.first, newPosition.second, player, textureMap);
-        movingBlock.setCurrTypeUnder(matrix[newPosition.second][newPosition.first].getTypeObject());
+        movingBlock.setBlock(newPosition.first,
+                    newPosition.second, player, textureMap);
+        movingBlock.setCurrTypeUnder(
+                matrix[newPosition.second][newPosition.first].getTypeObject());
         playerLocation = newPosition;
         moveMatrixBlocks(replaceBlock, movingBlock);
         return true;
-    } else if (nextPlayerMove.getMovable() == true && nextBlockMove.getMovable() == false) {
+    } else if (nextPlayerMove.getMovable() == true
+                    && nextBlockMove.getMovable() == false) {
         oldPosition = nextPlayerMove.getCurrSpace();
         newPosition = nextPlayerMove.getNextSpace();
 
         // always get the type that will be under player
-        replaceBlock.setBlock(oldPosition.first, oldPosition.second, getTypeUnderAtPosition(oldPosition), textureMap);
+        replaceBlock.setBlock(oldPosition.first, oldPosition.second,
+                    getTypeUnderAtPosition(oldPosition), textureMap);
         replaceBlock.setCurrTypeUnder(replaceBlock.getTypeObject());
-        movingBlock.setBlock(newPosition.first, newPosition.second, player, textureMap);
-        movingBlock.setCurrTypeUnder(matrix[newPosition.second][newPosition.first].getTypeObject());
+        movingBlock.setBlock(newPosition.first,
+                    newPosition.second, player, textureMap);
+        movingBlock.setCurrTypeUnder(
+                matrix[newPosition.second][newPosition.first].getTypeObject());
         playerLocation = newPosition;
         moveMatrixBlocks(replaceBlock, movingBlock);
         return true;
@@ -198,11 +245,18 @@ bool Sokoban::executeMoveObjects(void) {
     return false;
 }
 
-void Sokoban::moveMatrixBlocks(GameObject& replaceBlock, GameObject& movingBlock) {
-    matrix[replaceBlock.getYlocation()][replaceBlock.getXlocation()] = replaceBlock;
-    matrix[movingBlock.getYlocation()][movingBlock.getXlocation()] = movingBlock;
+// replaces the block being moved with replace block
+// and puts moving block in its new position
+void Sokoban::moveMatrixBlocks(const GameObject& replaceBlock,
+                                    const GameObject& movingBlock) {
+    matrix[replaceBlock.getYlocation()][replaceBlock.getXlocation()]
+                = replaceBlock;
+    matrix[movingBlock.getYlocation()][movingBlock.getXlocation()]
+                = movingBlock;
 }
 
+// renders the game map using the information
+// contained in the matrix's gameObjects
 void Sokoban::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     GameObject block;
     sf::Vector2f location;
@@ -216,8 +270,10 @@ void Sokoban::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     for (int y = 0; y < ySize; y++) {
         for (int x = 0; x < xSize; x++) {
             block = matrix[y][x];
-            getDrawPos(location, block, textureSize);
-            if (block.getTypeObject() == player || block.getTypeObject() == stored) {
+            setDrawPos(location, block, textureSize);
+            // if there is a layered block the type under must be drawn first
+            if (block.getTypeObject() == player
+                    || block.getTypeObject() == stored) {
                 pos = textureMap.find(block.getCurrTypeUnder());
                 floorTexture = pos->second;
                 floorSprite.setTexture(floorTexture);
@@ -297,7 +353,7 @@ bool Sokoban::buildGameObjectVector(ifstream& in, vector<GameObject>& objects) {
     return true;
 }
 
-void Sokoban::setSokobanMatrix(vector<GameObject>& blocks) {
+void Sokoban::setSokobanMatrix(const vector<GameObject>& blocks) {
     // puts block in matrix based of the objects
     // predetermined location
     int x = 0, y = 0;
@@ -317,7 +373,8 @@ ifstream& operator>>(ifstream& in, Sokoban& level) {
     // make sure matirx is clear before it is used again.
     level.matrix.clear();
     // take map size input
-    in >> xtemp >> ytemp;
+    in >> xtemp;
+    in >> ytemp;
     if (xtemp <= 0 && ytemp <= 0) {
         exit(1);
     }
@@ -343,23 +400,14 @@ ifstream& operator>>(ifstream& in, Sokoban& level) {
     return in;
 }
 
+// loads new textures into map
 void Sokoban::setTextureInMap(typeObject type, sf::Texture& texture) {
     textureMap[type] = texture;
 }
 
-
-
-void getTexturePixelSize(sf::Texture texture, pair<int, int>& cor) {
-    sf::Vector2u pixels;
-    pixels = texture.getSize();
-    cor.first = static_cast<int>(pixels.x);
-    cor.second = static_cast<int>(pixels.y);
-    return;
-}
-
-void getDrawPos(sf::Vector2f& location, const GameObject& block, const pair<int, int>& xyCor) {
+// get drawing position of game object
+void setDrawPos(sf::Vector2f& location,
+            const GameObject& block, const pair<int, int>& xyCor) {
     location.x = block.getXlocation() * xyCor.first;
     location.y = block.getYlocation() * xyCor.second;
 }
-
-
