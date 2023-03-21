@@ -1,0 +1,52 @@
+/**********************************************************************
+ *  Recursive Graphics ((Pythagoras Tree) ps3-readme.txt template
+ **********************************************************************/
+
+Name: Daniel Bergeron 
+Hours to complete assignment: 1 day
+
+/**********************************************************************
+ *  Briefly discuss the assignment itself and what you accomplished.
+ **********************************************************************/
+The assignemnt was to implement a pythagorean tree. The idea was to create 
+a class called ptree that uses a recusursice function to draw fractual in the
+shape of a tree. I was able to acomplish this by using the visual capabilities of
+the sfml lib and a vector data structure.
+
+  /**********************************************************************
+ *  Discuss one or more key algorithms, data structures, or 
+ *  OO designs that were central to the assignment.
+ **********************************************************************/
+    Vectors was crucial for me since it allowed, to create all of the visuals
+    in the recursion and store them. This made my draw function very simple
+    since all it had to do was run throught the vector draw each object. I did 
+    not want to mix the visuals with the background work so created independent
+    systems for each that where called in the driver together to accomplish the 
+    task.
+
+/**********************************************************************
+ *  Briefly explain the workings of the features you implemented.
+ *  Describe if and how do you used the smart pointers 
+ *  Include code excerpts.
+ **********************************************************************/
+In each step the program uses the previous lengths to calculate the and trig 
+properties to calcualte the what the new rec will be. It creates two recs for 
+either side then it calls a recursion on both to work down the left and right 
+branch.
+
+
+/**********************************************************************
+ *  List whatever help (if any) you received from the instructor,
+ *  classmates, or anyone else.
+ **********************************************************************/
+Sfml, documentation and in class discussions with class mates who's tips 
+where extremely valueable but whos names I can't remember.
+
+/**********************************************************************
+ *  Describe any serious problems you encountered.                    
+ **********************************************************************/
+Had serious problem with size calculations.
+
+/**********************************************************************
+ *  List any other comments here.                                     
+ **********************************************************************/
