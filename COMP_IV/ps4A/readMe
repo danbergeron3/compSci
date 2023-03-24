@@ -1,0 +1,64 @@
+/**********************************************************************
+ *  Checkers ps4a-readme.txt template
+ **********************************************************************/
+
+Name:Daniel Bergeron
+Hours to complete assignment:10 hrs
+
+/**********************************************************************
+ *  Briefly discuss the assignment itself and what you accomplished.
+ **********************************************************************/
+This assignment involved setting up the a checkers board for a checkers 
+game. It did not require the addition of the actual game play mechanics, 
+but it did require the development of an interactive highlight feature.
+so when a player mouse over a piece it the background becomes yellow. I 
+was able to get all of these features working properly.
+
+  /**********************************************************************
+ *  Discuss one or more key algorithms, data structures, or 
+ *  OO designs that were central to the assignment.
+ **********************************************************************/
+There are two elements that were central to this assignment the first being 
+the vector. I used a vector to create a matrix which I used to as place to 
+store game pieces which are the importent OO design for thus program. Pieces
+are a class used to give each piece characteristics that allow it to interact
+with thecheckers and main as its own little interphase, that builds
+into the entire checkers game.
+
+/**********************************************************************
+ *  Briefly explain the workings of the features you implemented.
+ *  Describe if and how do you used the smart pointers 
+ *  Include code excerpts.
+ **********************************************************************/
+Did not use smart pointers. The visual "game board" is just an 8x8 arrray
+with alternating colors made of sf::rectanlge shapes, that reamin static 
+throughout the game. If the dimesions of the game board needed to be 
+dynamic I would alloacte RxC and use smart pointers inplace of raw pointers
+
+The piece matrix uses vectors rather than arrays for its already constructed
+and in case i ever want to make a larger board, the matrix holds piece objects
+This object is in the checkers class which is responsible for all the games 
+higher operations. 
+
+The piece class is used to construct piece objects and has the most streamlined
+interphase since all the high level decisons from Checkers class devovle to Piece 
+objects it contains.
+
+/**********************************************************************
+ *  List whatever help (if any) you received from the instructor,
+ *  classmates, or anyone else.
+ **********************************************************************/
+sfml library 
+
+/**********************************************************************
+ *  Describe any serious problems you encountered.                    
+ **********************************************************************/
+Two major prblems occured: One was a result of left over mouse input
+causing input, this was resolved by creating a clearMouseBuffer function.
+The second was a seg fault which occured whenever the window is resized
+since this does not effect game play and the window starts of in the correct
+size it has not been patched.
+
+/**********************************************************************
+ *  List any other comments here.                                     
+ **********************************************************************/

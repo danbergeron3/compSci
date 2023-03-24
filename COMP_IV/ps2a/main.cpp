@@ -1,67 +1,68 @@
+/* "Copyright [2023] <Daniel Bergeron>" */
 #include "Sokoban.hpp"
 
+// Function abstracts the grunt work of
+// making the visuals away from main
+// pre: Is passed a valid Sokoban object
 void generateGameMap(Sokoban& level);
-void getTexturePixelSize(sf::Texture texture,int& x, int& y);
 
-int main(){
+// pre: Passed valid texture and int pair by refrence
+// post: pair will be given new values
+void getTexturePixelSize(sf::Texture& texture, pair<int, int>& cor);
+
+int main() {
+    // Simple driver to load and test maps
     Sokoban lv;
     ifstream fp;
+
+    // test1
+
     fp.open("level1.txt");
     fp >> lv;
-    generateGameMap(lv);
+    sf::RenderWindow window1(sf::VideoMode(lv.getTextureSizeX() * lv .getWidth(),
+                                lv.getTextureSizeY() * lv .getHeight()), "Sokoban");
+    while (window1.isOpen()) {
+        sf::Event event;
+        while (window1.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window1.close();
+        }
+    }
+        window1.draw(lv);
+        window1.display();
+    }
     fp.close();
+    // test2
+    fp.open("level2.txt");
+    fp >> lv;
+
+    sf::RenderWindow window2(sf::VideoMode(lv.getTextureSizeX() * lv .getWidth(),
+                                lv.getTextureSizeY() * lv .getHeight()), "Sokoban");
+    while (window2.isOpen()) {
+        sf::Event event;
+        while (window2.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window2.close();
+        }
+    }
+        window2.draw(lv);
+        window2.display();
+    }
+
+    fp.close();
+
+    // stub test
+    lv.movePlayer(noMove);
+
     return 0;
 }
 
-void generateGameMap(Sokoban& level){
-    int x, y; 
-    sf::Texture texture, ground;;
-    sf::Sprite sprite, floor;
-    sf::Event event;
-    sf::Vector2f location;
-    GameObject block;
-    bool drawn = false;
-    
-    texture.loadFromFile("sokoban/images/environment_03.png");
-    getTexturePixelSize(texture, x, y);
-    sf::RenderWindow window(sf::VideoMode(x * level.getWidth(), y * level.getHeight()), "Input");
 
-    while (window.isOpen()) {
-        
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed){
-                window.close();
-            }
-        }
-        if(drawn == false){
-            for(int i = 0; i < level.getHeight(); i++){
-                for(int j = 0; j < level.getWidth(); j++){
-                    block = level.getGameObject(j , i);
-                    makePixelCoordinate(location, block, x, y);
-                    if(block.getBlock() == player){
-                        ground.loadFromFile("sokoban/images/ground_01.png");
-                        floor.setTexture(ground);
-                        floor.setPosition(location);
-                        window.draw(floor);
-                    }
-                    sprite = level.getSprite(block);
-                    sprite.setPosition(location);
-                    window.draw(sprite);
-                    window.display();
-                }
-            }
-            drawn = true;
-        }
-    }
-}
-
-
-
-void getTexturePixelSize(sf::Texture texture, int& x, int& y){
+void getTexturePixelSize(sf::Texture& texture, pair<int, int>& cor) {
     sf::Vector2u pixels;
     texture.loadFromFile("sokoban/images/environment_03.png");
     pixels = texture.getSize();
-    x = static_cast<int>(pixels.x);
-    y = static_cast<int>(pixels.y);
+    cor.first = static_cast<int>(pixels.x);
+    cor.second = static_cast<int>(pixels.y);
     return;
 }
