@@ -12,20 +12,21 @@ int main(int argc, char* argv[]) {
     // fonts
     sf::Text text, text2;
     sf::Font font;
-    if (!font.loadFromFile("endGameFont.ttf")) {
+    if (!font.loadFromFile("resources/endGameFont.ttf")) {
         cout << "Font failed to load\n";
     }
     text.setFont(font);
-    text2.setFont(font);
     text.setString("Game Over!!");
-    text2.setString("Press Q to quit");
     text.setCharacterSize(100);
-    text2.setCharacterSize(30);
-    text.setPosition((GAMEBOARDLENGTH * static_cast<double>(SPACESIZES)) / 5.0,
-                (GAMEBOARDLENGTH * static_cast<double>(SPACESIZES)) / 4.0);
+    text.setPosition((static_cast<float>(window1.getSize().x / 5.00)),
+                (static_cast<float>(window1.getSize().y / 4.00)));
     text.setFillColor(sf::Color::White);
-    text2.setFillColor(sf::Color::Blue);
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+    text2.setFont(font);
+    text2.setString("Press Q to quit");
+    text2.setCharacterSize(30);
+    text2.setFillColor(sf::Color::Blue);
     text2.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
     clearBuffer();
@@ -47,24 +48,31 @@ int main(int argc, char* argv[]) {
             game1.move(location);
         }
         while (game1.endGameCheck()) {
-                cout << "GAME OVER!\n";
-                // inside the main loop, between window.clear()
-                // and window.display()
-                while (window1.pollEvent(event)) {
-                    if (event.type == sf::Event::Closed) {
-                        clearBuffer();
-                        window1.close();
-                        return 0;
-                    }
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+            // inside the main loop, between window.clear()
+            // and window.display()
+            while (window1.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    clearBuffer();
+                    window1.close();
                     return 0;
                 }
-                window1.clear(sf::Color::Black);
-                window1.draw(game1);
-                window1.draw(text);
-                window1.draw(text2);
-                window1.display();
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+                return 0;
+            }
+            window1.clear(sf::Color::Black);
+            window1.draw(game1);
+            if (game1.getBlackPieceCount() == 0) {
+                text.setString("RED WINS!!!");
+            } else if (game1.getRedPieceCount() == 0) {
+                text.setString("Black WINS!!!");
+            } else {
+                // For possible edge case
+                text.setString("Draw!");
+            }
+            window1.draw(text);
+            window1.draw(text2);
+            window1.display();
         }
         // take selected input and see if next position clicked position is good
         // then move
@@ -73,7 +81,7 @@ int main(int argc, char* argv[]) {
         window1.draw(game1);
         window1.display();
     }
-    clearBuffer();
+    // clearBuffer();
     return 0;
 }
 
@@ -82,5 +90,4 @@ int main(int argc, char* argv[]) {
 void clearBuffer(void) {
     while (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {}
     while (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {}
-
 }

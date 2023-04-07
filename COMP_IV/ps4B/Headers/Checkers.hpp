@@ -2,11 +2,15 @@
 #define _HOME_DBERGERO3_PROGRAMS_COMP4_PS4B_HEADERS_CHECKERS_HPP_
 // Copyright [2023] <Daniel Bergeron>
 // ptree class that derives from sf::Drawable
+#include <ranges>
+#include <cmath>
+using std::abs;
 #include <iostream>
 using std::cout;
 using std::endl;
 #include <utility>
 using std::pair;
+#include <algorithm>
 #include <string>
 using std::string;
 using std::stoi;
@@ -15,8 +19,6 @@ using std::stod;
 using std::vector;
 #include <map>
 using std::map;
-#include <cmath>
-using std::abs;
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -83,9 +85,17 @@ class Checkers : public sf::Drawable {
     // move function
     bool move(sf::Vector2i LocalPosition);
 
+    // turn management
     inline void increaseTurn(void) {turn++; }
     int getTurn(void);
+
+    // Tells weather or not to end the game
     bool endGameCheck();
+
+    // accesors
+    inline int getRedPieceCount(void) {return redWin; }
+    inline int getBlackPieceCount(void) {return blackWin; }
+
 
  private:
     // helper & private funcs
@@ -93,14 +103,17 @@ class Checkers : public sf::Drawable {
 
     // move helper functions
     moveSet getMovetype(sf::Vector2i LocalPosition);
+    // function resets the highlighted square
     void resetHighLight(void);
 
+    // when given a move it is responsible
     bool executeMove(moveSet currMove);
 
     // execute helper
     bool removePiece(moveSet destroy);
 
-
+    // function converts a normal pawn to king
+    // Needs the location and the type to do it
     void makeKing(pieceType currType, sf::Vector2i LocalPosition);
 
     // load intial elements
@@ -111,6 +124,8 @@ class Checkers : public sf::Drawable {
 
     // member vars
     int turn = 0;
+    int redWin = 0;
+    int blackWin = 0;
     Piece currPiece;
     sf::Vector2f tileSize;
     sf::Vector2f currHighLight;

@@ -4,13 +4,13 @@ OBJ = main.o Checkers.o
 LIBS = -lsfml-window -lsfml-graphics -lsfml-system 
 DEPS = Checkers.hpp
 
-all: Checkers_driver lint
+all: Checkers lint
 
-Checkers_driver: $(OBJ)
-	$(CC) $(CFLAGS) -o Checkers_driver $(OBJ) $(LIBS) 
+Checkers: $(OBJ)
+	$(CC) $(CFLAGS) -o Checkers $(OBJ) $(LIBS) 
 lint: 
 	cpplint *.cpp Headers/Checkers.hpp 
 %.o: %.cpp $(DEPS)
 	$(CC) $(CFLAGS) -c $<
 clean:
-	rm -f $(OBJ) Checkers_driver lint
+	rm -f $(OBJ) Checkers lint

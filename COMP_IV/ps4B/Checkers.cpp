@@ -36,32 +36,23 @@ void Checkers::loadMoveMap(void) {
     // enum moveSet {nil, upLeft, upRight, downLeft, downRight, upLeftJump,
     // upRightJump, downRightJump, downLeftJump };
     sf::Vector2i moveVal;
-    moveVal.x = 0;
-    moveVal.y = 0;
+    moveVal.x = 0; moveVal.y = 0;
     moveMap[nil] = moveVal;
-    moveVal.x = -1;
-    moveVal.y = -1;
+    moveVal.x = -1; moveVal.y = -1;
     moveMap[upLeft] = moveVal;
-    moveVal.x = 1;
-    moveVal.y = -1;
+    moveVal.x = 1; moveVal.y = -1;
     moveMap[upRight] = moveVal;
-    moveVal.x = 1;
-    moveVal.y = 1;
+    moveVal.x = 1; moveVal.y = 1;
     moveMap[downLeft] = moveVal;
-    moveVal.x = -1;
-    moveVal.y = 1;
+    moveVal.x = -1; moveVal.y = 1;
     moveMap[downRight] = moveVal;
-    moveVal.x = -2;
-    moveVal.y = -2;
+    moveVal.x = -2; moveVal.y = -2;
     moveMap[upLeftJump] = moveVal;
-    moveVal.x = 2;
-    moveVal.y = -2;
+    moveVal.x = 2; moveVal.y = -2;
     moveMap[upRightJump] = moveVal;
-    moveVal.x = -2;
-    moveVal.y = 2;
+    moveVal.x = -2; moveVal.y = 2;
     moveMap[downRightJump] = moveVal;
-    moveVal.x = 2;
-    moveVal.y = 2;
+    moveVal.x = 2; moveVal.y = 2;
     moveMap[downLeftJump] = moveVal;
     return;
 }
@@ -150,13 +141,13 @@ void Checkers::loadPieceMatrix(void) {
 // is heavy
 void Checkers::loadTextureMap(void) {
     sf::Texture texture;
-    texture.loadFromFile("checkers/blackking.png");
+    texture.loadFromFile("resources/blackking.png");
     textureMap[blackKing] = texture;
-    texture.loadFromFile("checkers/blackpawn.png");
+    texture.loadFromFile("resources/blackpawn.png");
     textureMap[black] = texture;
-    texture.loadFromFile("checkers/redking.png");
+    texture.loadFromFile("resources/redking.png");
     textureMap[redKing] = texture;
-    texture.loadFromFile("checkers/redpawn.png");
+    texture.loadFromFile("resources/redpawn.png");
     textureMap[red] = texture;
 }
 
@@ -198,10 +189,8 @@ void Checkers::highLight(sf::Vector2i localPosition) {
     // if piece exsits highlight else do nothing
     if (selected.getIsPresent() == true) {
         if (colorTurn == 0 && selected.getpieceType() >= black) {
-            cout << "Not blacks turn\n";
             return;
         } else if (colorTurn == 1 && selected.getpieceType() < black) {
-            cout << "Not reds turn\n";
             return;
         }
     } else {
@@ -242,7 +231,6 @@ bool Checkers::move(sf::Vector2i LocalPosition) {
     moveSet currMove;
     currMove = getMovetype(LocalPosition);
     if (currMove == nil) {
-            cout << "Piece is present of already seleceted or out of bounds\n ";
         return false;
     }
     // check if king
@@ -253,17 +241,14 @@ bool Checkers::move(sf::Vector2i LocalPosition) {
     // red only moves up and black down
     // inside color if's
     pieceType currType = currPiece.getpieceType();
-    cout << "The curr sleceted piece type is: " << newPiece.getpieceType() << endl;
     if (currType == red) {
         if (currMove == downLeft || currMove == downRight
             || currMove == downLeftJump || currMove == downRightJump) {
-                cout << "failed red condition\n";
                 return false;
         }
     } else if (currType == black) {
         if (currMove == upLeft || currMove == upRight
             || currMove == upLeftJump || currMove == upRightJump) {
-                cout << "failed black condition\n";
                 return false;
         }
     }
@@ -294,13 +279,16 @@ moveSet Checkers::getMovetype(sf::Vector2i LPosition) {
     offset.x = currPiece.getPosition().x;
     offset.y = currPiece.getPosition().y;
 
+    // 1) use map to store what each move does mathamtically
+    // 2) using the curr pieces positon use the pair retieved from
+    // map add x & y together if the the sums agree return move type
+
     map<moveSet, sf::Vector2i>::iterator m;
     for (m = moveMap.begin(); m != moveMap.end(); ++m) {
         offset.x += m->second.x;
         offset.y += m->second.y;
         move = m->first;
         if (offset == LPosition) {
-            cout << "it worked move: " << move << " returned \n";
             return move;
         } else {
             offset.x = currPiece.getPosition().x;
@@ -308,18 +296,11 @@ moveSet Checkers::getMovetype(sf::Vector2i LPosition) {
             move = nil;
         }
     }
-
-    // 1) use map to store what each move does mathamtically
-    // 2) using the curr pieces positon use the pair retieved from
-    // map add x & y together if the the sums agree return move type
-
-    cout << "getmoveCall failed it failed or wrong square selected\n";
     return move;
 }
 
 // resest highlight for next draw cycle
 void Checkers::resetHighLight(void) {
-    cout << "resetHighlight success\n";
     Piece selected = pieceMatrix[currHighLight.x][currHighLight.y];
     selected.setIsHighLighted(false);
     pieceMatrix[currHighLight.x][currHighLight.y] = selected;
@@ -356,12 +337,10 @@ bool Checkers::executeMove(moveSet currMove) {
     currPiece.setIsHighLighted(false);
     pieceMatrix[currPiece.getPosition().x][currPiece.getPosition().y]
         = currPiece;
-    cout << "move executed\n";
     return true;
 }
 
 void Checkers::makeKing(pieceType currType, sf::Vector2i pos) {
-    cout << "In the name of the king\n";
     sf::Sprite sprite;
     Piece king =  pieceMatrix[pos.x][pos.y];
     int x = currType;
@@ -377,7 +356,7 @@ void Checkers::makeKing(pieceType currType, sf::Vector2i pos) {
 
 bool Checkers::removePiece(moveSet destroyMove) {
     // need moving pieces to test come back to later
-    cout << "This number should be positive: " << destroyMove << endl;
+
     sf::Vector2i pos = moveMap[destroyMove];
     pos.x += currPiece.getPosition().x;
     pos.y += currPiece.getPosition().y;
@@ -408,23 +387,26 @@ int Checkers::getTurn(void) {
 
 // returns last color standing
 bool Checkers::endGameCheck(void) {
-    int redCount = 0;
-    int blackCount = 0;
+    redWin = 0;
+    blackWin = 0;
     vector<vector<Piece>>::iterator pieceVec = pieceMatrix.begin();
     vector<Piece>::iterator p;
-    for ( ; pieceVec != pieceMatrix.end(); pieceVec++) {
-        for (p = pieceVec->begin(); p != pieceVec->end(); p++) {
-            if (p->getIsPresent() == true) {
-                if (p->getpieceType() == red || p->getpieceType() == redKing) {
-                    redCount++;
-                } else if (p->getpieceType() == black
-                            || p->getpieceType() == blackKing) {
-                    blackCount++;
+
+    auto presentCheck = [&](Piece guy){
+        if (guy.getIsPresent() == true) {
+                if (guy.getpieceType() == red
+                            || guy.getpieceType() == redKing) {
+                    redWin++;
+                } else if (guy.getpieceType() == black
+                            || guy.getpieceType() == blackKing) {
+                    blackWin++;
                 }
             }
-        }
+    };
+    for ( ; pieceVec != pieceMatrix.end(); pieceVec++) {
+        std::for_each(pieceVec->begin(), pieceVec->end(), presentCheck);
     }
-    if (redCount == 0 || blackCount == 0) {
+    if (redWin == 0 || blackWin == 0) {
         return true;
     } else {
         return false;

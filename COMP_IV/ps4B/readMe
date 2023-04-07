@@ -1,0 +1,69 @@
+/**********************************************************************
+ *  Checkers ps4b-readme.txt
+ **********************************************************************/
+
+Name: Daniel Bergeron
+Hours to complete assignment: 24hrs
+
+/**********************************************************************
+ *  Briefly discuss the assignment itself and what you accomplished.
+ **********************************************************************/
+The goal of this assignment was to build of the previous assignments
+implementation of a checkers board and actualy add the machanics. I was 
+able to bring the pieces to life, giving them movement and adding the rules
+that the movemnet had to adhere to. I also added a win condtion for each side.
+  /**********************************************************************
+ *  Discuss one or more key algorithms, data structures, or 
+ *  OO designs that were central to the assignment.
+ **********************************************************************/
+Data Structures: For data structures I used maps & vectors I used vectors
+because of its built in interphase along with it's ability to easily model
+a 2-d surface in programing. maps where use full for encoding and decoding,
+movement/texture information that I needed throughout the program, since the 
+amount of data for these two cases was less importent then the type of data,
+the maps ability to use key allowed me to have vital info on hand.
+
+OOP:In the checkers class I created a supporting piece class that could interphse with
+the checkers class, this oop idea of interphasing was imperative for this projects succes.
+
+Algorithm & Lambda: I used for_each range function which allowed me to apply a lambda 
+function that calculated how many pieces where left on the board. Using the lambda here
+allowed me to remove a nested loop and make the program a more readable.
+/**********************************************************************
+ *  Briefly explain the workings of the features you implemented.
+ *  Describe if and how do you used the smart pointers 
+ *  Include code excerpts.
+ **********************************************************************/
+In this program I have a checkers class, this class is responsible for 
+for visuals along with enforcing game rules on those visuals.
+It accomplishes this with three main functions an overidden draw function 
+from sf::drawable, this function is soly responisble for drawing everything.
+No other function is allowed to make anything visable to the users without going 
+through the draw function. There is a move function which breaks the problem of 
+movement down into several importent aspects, first can we move, if so what type 
+of move can we do, then if possible exectute the move, if move succeaded, then
+we no longer have a selected piece and finaly now that we moved who gets to move next;
+(in hignsight the turns could have been seprate func, a lot I would change with more time).
+Along with couple accesor functions the next importent func is the endgame check, this function
+is responisble for checking if the game can move to an endgame state.
+
+The Checkers class then interpohases with the piece class, which contains all the attributes 
+of the piece class, here if given more time I would split this class in two and have it inherhit
+from a base class. However the piece class develops a strong enough interphase that allows checkers 
+to use its methods to build a sturdy game.
+
+/**********************************************************************
+ *  List whatever help (if any) you received from the instructor,
+ *  classmates, or anyone else.
+ **********************************************************************/
+
+
+/**********************************************************************
+ *  Describe any serious problems you encountered.                    
+ **********************************************************************/
+Input buffering has been diffcult to manage causing seg faults as well as 
+selection delays.
+
+/**********************************************************************
+ *  List any other comments here.                                     
+ **********************************************************************/
