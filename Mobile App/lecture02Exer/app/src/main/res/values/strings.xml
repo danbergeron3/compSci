@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">lecture02Exer</string>
+    <string name="firstText">Hello</string>
+    <string name="secondText">bye!</string>
+    <string name="firstImage">me</string>
+</resources>

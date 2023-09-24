@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Invitation Card</string>
+    <string name="title">Join Us For a\nBirthday Bash</string>
+    <string name="with">Join Daniel Bergeron</string>
+    <string name="when">On 10/1/2023, 8pm est</string>
+    <string name="where">110 Middle St, Lowell, MA, 01832</string>
+</resources>

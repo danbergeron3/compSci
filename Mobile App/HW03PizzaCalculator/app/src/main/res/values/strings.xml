@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">HW03-PizzaCalculator</string>
+    <string name="prompt1">Number of guests?</string>
+    <string name="prompt2">How Hungry?</string>
+    <string name="prompt3">Hungry levels</string>
+    <string name="hint1">Enter Number Here</string>
+    <string name="button1">Calculate</string>
+    <string name="answer"> </string>
+    <string-array name="hungry_level">
+        <item>Light</item>
+        <item>Medium</item>
+        <item>Ravenous</item>
+    </string-array>
+</resources>

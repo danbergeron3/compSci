@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">lecture05Exer</string>
+    <string name="update">Update</string>
+    <string name="hint">Enter some words here</string>
+    <string name="background">background</string>
+    <string-array name="color_list">
+        <item>black</item>
+        <item>blue</item>
+        <item>gray</item>
+        <item>yellow</item>
+        <item>red</item>
+    </string-array>
+</resources>
