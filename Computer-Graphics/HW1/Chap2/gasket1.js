@@ -4,16 +4,15 @@ var gl;
 var points;
 
 var NumPoints = 50000;
-
+var windowOffset = 40;
+var pointFactor = 5000;
+var randColor = [0.0, 0.0, 0.0, 1.0];
 
 window.onload = function init()
 {
 
     function gasket1() {
-       
-
-        
-
+    
         //
         //  Initialize our data for the Sierpinski Gasket
         //
@@ -25,8 +24,6 @@ window.onload = function init()
             vec2(  0,  1 ),
             vec2(  1, -1 )
         ];
-
-    
 
         // Specify a starting point p for our iterations
         // p must lie inside any set of three vertices
@@ -43,8 +40,18 @@ window.onload = function init()
         // Compute new points
         // Each new point is located midway between
         // last point and a randomly chosen vertex
-
-        for ( var i = 0; points.length < NumPoints; ++i ) {
+        if (shrink === true) {
+            curPoints -= pointFactor;
+            if (curPoints <= 0) {
+                shrink = false;
+            }
+        } else {
+            curPoints += pointFactor;
+            if (curPoints >= NumPoints) {
+                shrink = true;
+            }
+        }
+        for ( var i = 0; points.length < curPoints; ++i ) {
             var j = Math.floor(Math.random() * 3);
             p = add( points[i], vertices[j] );
             p = scale( 0.5, p );
@@ -54,9 +61,20 @@ window.onload = function init()
         //
         //  Configure WebGL
         //
-        canvas_width = canvas_width - 100;
-        canvas_height = canvas_height - 100;
-        origin_x += 50;
+        if(shrink === true) {
+            canvas_width = canvas_width - windowOffset;
+            canvas_height = canvas_height - windowOffset;
+            origin_x += windowOffset/2;   
+            console.log("shrink x: " + origin_x);
+        } else {
+            if(canvas_width < canvas.width && canvas_height < canvas.height) {
+                canvas_width = canvas_width + windowOffset;
+                canvas_height = canvas_height + windowOffset;
+                origin_x -= windowOffset/2;
+                console.log("grow x: " + origin_x);   
+                
+            }
+        }
         origin_y = 0;
 
         updateVeiwPort(canvas_width, canvas_height, origin_x, origin_y);
@@ -78,10 +96,22 @@ window.onload = function init()
         var vPosition = gl.getAttribLocation( program, "vPosition" );
         gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
         gl.enableVertexAttribArray( vPosition );
+
+        // make random RGB values 
+        for(let i = 0; i < 3; i++) {
+            var color = Math.random();
+            randColor[i] = color;
+        }
+        // Get the uniform location for the custom color in the shader program
+        var randColorUniformLocation = gl.getUniformLocation(program, "randColor");
+
+        // Set the custom color in JavaScript
+        gl.uniform4fv(randColorUniformLocation, randColor);
+        console.log("Custom Color Location:", randColorUniformLocation);
+        console.log("Custom Color Value:", randColor);
         render();
         
         console.log("render done");
-        
     }
 
     function render() {
@@ -105,13 +135,10 @@ window.onload = function init()
     }
 
     function loop(timestamp) {
-        var progress = timestamp - lastRender
-        gasket1();
-    
         
-        lastRender = timestamp
+        gasket1();
         // window.requestAnimationFrame(loop)
-        setTimeout(loop, 1000);
+        setTimeout(loop, 78);
     }
 
     var canvas = document.getElementById( "gl-canvas" );
@@ -123,6 +150,7 @@ window.onload = function init()
     var origin_y = 0;
     var lastRender = 0;
     var curPoints = NumPoints;
+    let shrink = true;
     window.requestAnimationFrame(loop)
 };
 

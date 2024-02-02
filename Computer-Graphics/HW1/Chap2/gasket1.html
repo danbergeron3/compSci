@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 <title>2D Sierpinski Gasket</title>
-
+<link rel="stylesheet" href="./gasket1-css/gasket1.css">
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
 
@@ -17,11 +17,12 @@ main()
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
+uniform vec4 randColor;
 
 void
 main()
 {
-    gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+    gl_FragColor = randColor;
 }
 </script>
 
@@ -32,8 +33,12 @@ main()
 </head>
 
 <body>
-<canvas id="gl-canvas" width="512" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+<div id="render-plane">
+    <canvas id="gl-canvas" width="512" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+</div>
+
+
 </body>
 </html>
