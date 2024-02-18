@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<body>
+<form action="/action_page.php">
+  <label for="Points">Points:</label>
+  <input type="range" id="npoints" name="npoints" min=500 max=5000 onchange="onchange"><br><br>
+
+  <label for="Animation Speed">Animation Speed:</label>
+  <input type="range" id="speed" name="speed" min=10 max=100 onchange="onchange"><br><br>
+
+  <label for="ViewPortSize">ViewPortSize:</label>
+  <input type="range" id="vsize" name="speed" min=10 max=100 onchange="onchange"><br><br>
+
+  <label for="R">R:</label>
+  <input type="text" id="rbutton" name="rbutton"><br><br>
+  
+  <label for="G">G:</label>
+  <input type="text" id="gbutton" name="gbutton"><br><br>
+  
+  <label for="B">B:</label>
+  <input type="text" id="bbutton" name="bbutton"><br><br>
+  
+  <label for="Color">R:</label>
+  <input type="color" id="rbutton" name="rbutton"><br><br>
+<br>
+  <label for="status">Status: Generating points...</label>
+
+</form>
+<canvas width = "570" height = "570" id = "ev_canvas"></canvas>
+<script>
+//-------------------------------------------------------------------------------
+	// logging function;
+	//-------------------------------------------------------------------------------
+	function LOG(msg) {
+		console.log(msg);
+	}
+	
+
+	//-------------------------------------------------------------------------------
+	// event handler for mouse down;
+	//-------------------------------------------------------------------------------
+	var onchange = function(e) {
+		var funcname = 'onchange';
+//        x = event.pageX
+//        y = event.pageY
+//		LOG(funcname + 	" X: "+ x + " Y: " + y);
+		LOG(funcname + "value: " + e.value);
+		return false;
+	};
+
+	//--
+	//-------------------------------------------------------------------------------
+	// event handler for mouse down;
+	//-------------------------------------------------------------------------------
+	var mouseDown = function(e) {
+		var funcname = 'mouseDown';
+        x = event.pageX
+        y = event.pageY
+		LOG(funcname + 	" X: "+ x + " Y: " + y);
+		return false;
+	};
+
+	//-------------------------------------------------------------------------------
+	// event handler for mouse up;
+	//-------------------------------------------------------------------------------
+	var mouseUp = function(e){
+		var funcname = 'mouseUp';
+        x = event.pageX
+        y = event.pageY
+		LOG(funcname + 	" X: "+ x + " Y: " + y);
+
+		g_drag = false;
+	};
+
+	//-------------------------------------------------------------------------------
+	// event handler for mouse move;
+	//-------------------------------------------------------------------------------
+	var mouseMove = function(e) {
+		var funcname = 'mouseMove';
+        x = event.pageX
+        y = event.pageY
+		LOG(funcname + 	" X: "+ x + " Y: " + y);
+	};
+
+	//-------------------------------------------------------------------------------
+	// event handler for mouse move;
+	//-------------------------------------------------------------------------------
+	var onresize = function(e) {
+		var funcname = 'onresize';
+//        x = event.pageX
+//        y = event.pageY
+//		LOG(funcname + 	" X: "+ x + " Y: " + y);
+		LOG(funcname);
+	};
+	//-------------------------------------------------------------------------------
+	// set up the mouse event handlers;
+	//-------------------------------------------------------------------------------
+	function add_event_handlers(canvas) {
+		var funcname = 'add_event_handlers';
+		LOG(funcname);
+
+		canvas.addEventListener("mousedown", mouseDown, false);
+		canvas.addEventListener("mouseup", mouseUp, false);
+		canvas.addEventListener("mouseout", mouseUp, false);
+		canvas.addEventListener("mousemove", mouseMove, false);
+//        canvas.resize(onresize)
+	}
+
+	//-------------------------------------------------------------------------------
+	// get the canvas object from the document;
+	//-------------------------------------------------------------------------------
+	function get_canvas(document, canvas_name) {
+		var funcname = 'get_canvas';
+		LOG(funcname);
+
+		var canvas = document.getElementById(canvas_name);
+
+		return canvas;
+	}
+	
+	//-------------------------------------------------------------------------------
+	//
+	// main execution begins here
+	//
+	//-------------------------------------------------------------------------------
+	
+	// global canvas object;
+	var g_canvas		= get_canvas(document, 'ev_canvas');
+    add_event_handlers(g_canvas);
+	
+
+	
+</script>
+</body>
+</html>
+

@@ -33,11 +33,41 @@ main()
 </head>
 
 <body>
-<div id="render-plane">
-    <canvas id="gl-canvas" width="512" height="512">
-        Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-</div>
+    <div class="flex-container">
+        <div class="form-container">
+            <form action="/action_page.php">
+                <label for="Points">Points:</label>
+                <input type="range" id="npoints" name="npoints" min=500 max=25000 onchange="onchange"><br><br>
+            
+                <label for="Animation Speed">Animation Speed:</label>
+                <input type="range" id="speed" name="speed" min=10 max=512 onchange="onchange"><br><br>
+            
+                <label for="ViewPortSize">ViewPortSize:</label>
+                <input type="range" id="vsize" name="speed" min=10 max=512 onchange="onchange"><br><br>
+                
+                <p> Must be a Number(0-255) </p>
+                <label for="R">R:</label>
+                <input type="text" id="rbutton" name="rbutton"><br><br>
+                
+                <label for="G">G:</label>
+                <input type="text" id="gbutton" name="gbutton"><br><br>
+                
+                <label for="B">B:</label>
+                <input type="text" id="bbutton" name="bbutton"><br><br>
+                
+                <label for="Color">R:</label>
+                <input type="color" id="rbutton2" name="rbutton"><br><br>
+            <br>
+                <label for="status" id="stat">Status:</label>
+            
+            </form>
+        </div>
+        <div class="render-container">
+            <canvas id="gl-canvas" width="512" height="512">
+                Oops ... your browser doesn't support the HTML5 canvas element
+            </canvas>
+        </div>
+    </div>
 
 
 </body>

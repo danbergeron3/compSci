@@ -4,19 +4,17 @@ var gl;
 var points;
 
 var NumPoints = 50000;
-var windowOffset = 40;
+
 var pointFactor = 5000;
 var randColor = [0.0, 0.0, 0.0, 1.0];
 
 window.onload = function init()
 {
-
-    function gasket1() {
     
+    function gasket1() {
         //
         //  Initialize our data for the Sierpinski Gasket
         //
-
         // First, initialize the corners of our gasket with three points.
 
         var vertices = [
@@ -40,17 +38,7 @@ window.onload = function init()
         // Compute new points
         // Each new point is located midway between
         // last point and a randomly chosen vertex
-        if (shrink === true) {
-            curPoints -= pointFactor;
-            if (curPoints <= 0) {
-                shrink = false;
-            }
-        } else {
-            curPoints += pointFactor;
-            if (curPoints >= NumPoints) {
-                shrink = true;
-            }
-        }
+        
         for ( var i = 0; points.length < curPoints; ++i ) {
             var j = Math.floor(Math.random() * 3);
             p = add( points[i], vertices[j] );
@@ -58,30 +46,10 @@ window.onload = function init()
             points.push( p );
         }
 
-        //
-        //  Configure WebGL
-        //
-        if(shrink === true) {
-            canvas_width = canvas_width - windowOffset;
-            canvas_height = canvas_height - windowOffset;
-            origin_x += windowOffset/2;   
-            console.log("shrink x: " + origin_x);
-        } else {
-            if(canvas_width < canvas.width && canvas_height < canvas.height) {
-                canvas_width = canvas_width + windowOffset;
-                canvas_height = canvas_height + windowOffset;
-                origin_x -= windowOffset/2;
-                console.log("grow x: " + origin_x);   
-                
-            }
-        }
-        origin_y = 0;
-
-        updateVeiwPort(canvas_width, canvas_height, origin_x, origin_y);
+       // updateVeiwPort(canvas_width, canvas_height, origin_x, origin_y);
         gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
         //  Load shaders and initialize attribute buffers
-
         var program = initShaders( gl, "vertex-shader", "fragment-shader" );
         gl.useProgram( program );
 
@@ -96,22 +64,19 @@ window.onload = function init()
         var vPosition = gl.getAttribLocation( program, "vPosition" );
         gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
         gl.enableVertexAttribArray( vPosition );
-
+        
         // make random RGB values 
         for(let i = 0; i < 3; i++) {
-            var color = Math.random();
-            randColor[i] = color;
+            randColor[i] = rgb[i];
         }
         // Get the uniform location for the custom color in the shader program
         var randColorUniformLocation = gl.getUniformLocation(program, "randColor");
 
         // Set the custom color in JavaScript
         gl.uniform4fv(randColorUniformLocation, randColor);
-        console.log("Custom Color Location:", randColorUniformLocation);
-        console.log("Custom Color Value:", randColor);
+
         render();
         
-        console.log("render done");
     }
 
     function render() {
@@ -120,37 +85,164 @@ window.onload = function init()
         
     } 
 
-    function updateVeiwPort(w, h, x, y) {
-        if (w <= 0 || h <= 0) {
-            canvas_width = canvas.width;
-            canvas_height = canvas.height;
-            origin_x = 0;
-            origin_y = 0;
-            gl.viewport( origin_x, origin_y, canvas_width, canvas_height);
-            return;
-        }
-
-        gl.viewport( x, y, w, h);
-
-    }
-
+    // game loop
     function loop(timestamp) {
         
         gasket1();
         // window.requestAnimationFrame(loop)
-        setTimeout(loop, 78);
+        setTimeout(loop, time);
+        str = "Status: Done";
+        setTimeout(statChanger, 2000);
     }
 
+    function statChanger() {
+        status.textContent = str;
+    }
     var canvas = document.getElementById( "gl-canvas" );
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
-    var canvas_width = canvas.width;
-    var canvas_height = canvas.height;
     var origin_x = 0;
     var origin_y = 0;
-    var lastRender = 0;
     var curPoints = NumPoints;
-    let shrink = true;
+
+    let rgb = [0 , 0 , 0];
+    let r = document.getElementById("rbutton");
+    let g = document.getElementById("gbutton");
+    let b = document.getElementById("bbutton");
+    let picker = document.getElementById("rbutton2");
+
+    let viewPortSlider = document.getElementById("vsize");
+    let canvas_width = viewPortSlider.value;
+    let canvas_height = viewPortSlider.value;
+    gl.viewport( 0, 0, canvas_width, canvas_height);
+    
+    let timeSlider = document.getElementById("speed");
+    let time = timeSlider.value;
+
+    let pointSlider = document.getElementById("npoints");
+
+    let status = document.getElementById("stat");
+    let str = "Status";
+    statChanger();
+    pointSlider.addEventListener("input", () => {
+        curPoints = pointSlider.value;
+        str = "Status: Changing Points";
+        statChanger();
+        
+    });
+
+    timeSlider.addEventListener("input", () => {
+        time = timeSlider.value;
+        str = "Status: Changing Animation Speed";
+        statChanger();
+    });
+
+    viewPortSlider.addEventListener("input", () => {
+        console.log("x: " + origin_x);
+        canvas_width = (viewPortSlider.value);
+        canvas_height =(viewPortSlider.value);
+        origin_y = 0;
+        origin_x = 0; 
+        gl.viewport(origin_x, origin_y, canvas_width, canvas_height);
+        str = "Status: Changing Animation Size";
+        statChanger();
+    });
+
+    picker.addEventListener("input", (event) => {
+        var selectedColor = event.target.value;
+
+        str = "Status: Applying Color to Shader";
+        statChanger();
+        // Parse the color value to extract individual RGB components
+        var red = parseInt(selectedColor.substr(1, 2), 16);
+        var green = parseInt(selectedColor.substr(3, 2), 16);
+        var blue = parseInt(selectedColor.substr(5, 2), 16);
+
+        rgb = [(parseFloat(red, 10)/255), (parseFloat(green, 10)/255), (parseFloat(blue, 10)/255)];
+        
+    });
+
+    r.addEventListener("input", () => {
+        str = "Status: Changing R Value in Shader";
+        statChanger();
+        setTimeout(1000);
+
+        let g = document.getElementById("gbutton");
+        let b = document.getElementById("bbutton");
+
+        if (r.value > 255 || r.value < 0) {
+            return;
+        }
+
+        if(r.value === "") {
+            r.value = 0;
+        }
+        if(g.value === "") {
+            g.value = 0;
+        }
+        if(b.value === "") {
+            b.value = 0;
+        }
+        
+        console.log(`Red: ${r.value} Green: ${g.value} Blue: ${b.value}`);
+        rgb[0] = parseFloat(r.value, 10)/255;
+        console.log(rgb[0]);
+        console.log(rgb);
+    });
+
+    g.addEventListener("input", () => {
+        str = "Status: Changing G Value in Shader";
+        statChanger();
+        setTimeout(1000);
+
+        let r = document.getElementById("rbutton");
+        let b = document.getElementById("bbutton");
+
+        if (g.value > 255 || g.value < 0) {
+            return;
+        }
+
+        if(r.value === "") {
+            r.value = 0;
+        }
+        if(g.value === "") {
+            g.value = 0;
+        }
+        if(b.value === "") {
+            b.value = 0;
+        }
+        console.log(`Red: ${r.value} Green: ${g.value} Blue: ${b.value}`);
+        rgb[1] = parseFloat(g.value, 10)/255;
+        console.log(rgb);
+    });
+
+    b.addEventListener("input", () => {
+        
+        str = "Status: Changing B Value in Shader";
+        statChanger();
+        setTimeout(1000);
+
+        let r = document.getElementById("rbutton");
+        let g = document.getElementById("gbutton");
+        if ( b.value > 255  || b.value < 0) {
+            return;
+        }
+
+        if(r.value === "") {
+            r.value = 0;
+        }
+        if(g.value === "") {
+            g.value = 0;
+        }
+        if(b.value === "") {
+            b.value = 0;
+        }
+        
+        console.log(`Red: ${r.value} Green: ${g.value} Blue: ${b.value}`);
+        rgb[2] = parseFloat(b.value, 10)/255;
+        console.log(rgb);
+    });
+
     window.requestAnimationFrame(loop)
 };
 
