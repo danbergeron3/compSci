@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HW3</title>
+    <style>
+        /* Basic styling */
+        canvas { border: 1px solid black; }
+    </style>
+    <script src="./resource/MV.js"></script>
+    <script src="./js/index.js"></script> 
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body onload="initialize()" >
+    <div class="wrapper">
+        <div class="table1">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <h1>Canvas with rubber band selection box.</h1>
+
+                            mouse_down:
+                            <p id="val1">X: 848 Y: 55 is_down = true</p>
+
+                            mouse_move:
+                            <p id="val2">X: 1426 Y: 462 is_down = false</p>
+
+                            mouse_up:
+                            <p id="val3">X: 1447 Y: 475 is_down = false</p>
+
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="canvas" border="1">
+            <canvas id="layer1" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+            <canvas id="layer2" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+        </div>
+        <div class="table2">
+            <table>
+                <th>Shapes</th>
+                <th>Transformations</th>
+                <tr>
+                    <td><button id="lineButton">Line</button></td>
+                    <td><button id="translateButton">Translate</button></td>
+                    <td><button id="select">Select</button></td>
+                    
+                </tr>
+                <tr>
+                    <td><button id="circleButton">Circle</button></td>
+                    <td><button id="scaleButton">Scale</button></td>
+                    <td><button id="reset">Reset</button></td>
+                </tr>
+                <tr>
+                    <td><button id="rectangleButton">Rectangle</button></td>
+                    <td><button id="rotateButton">Rotate</button></td>
+                </tr>
+                <tr>
+                    <td><button id="triangleButton">Triangle</button></td>
+                    <td><button id="rotateOriginButton">RotateOrigin</button></td>
+                </tr>
+                <tr>
+                    <td><button id="polygonButton">Polygon</button></td>  
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="selection">
+        <h2 id="mode">Current Mode: Translate</h2>
+        <h3 id="selectedShapeInfo">Currently Selected: None</h3>
+    </div>
+</body>
+</html>

@@ -2,9 +2,7 @@
 
 var gl;
 var points;
-
-var NumPoints = 50000;
-
+var NumPoints = 20000;
 var pointFactor = 5000;
 var randColor = [0.0, 0.0, 0.0, 1.0];
 
@@ -104,7 +102,7 @@ window.onload = function init()
     var origin_x = 0;
     var origin_y = 0;
     var curPoints = NumPoints;
-
+    const delay = 2000;
     let rgb = [0 , 0 , 0];
     let r = document.getElementById("rbutton");
     let g = document.getElementById("gbutton");
@@ -165,7 +163,7 @@ window.onload = function init()
     r.addEventListener("input", () => {
         str = "Status: Changing R Value in Shader";
         statChanger();
-        setTimeout(1000);
+        setTimeout(delay);
 
         let g = document.getElementById("gbutton");
         let b = document.getElementById("bbutton");
@@ -193,7 +191,7 @@ window.onload = function init()
     g.addEventListener("input", () => {
         str = "Status: Changing G Value in Shader";
         statChanger();
-        setTimeout(1000);
+        setTimeout(delay);
 
         let r = document.getElementById("rbutton");
         let b = document.getElementById("bbutton");
@@ -220,7 +218,7 @@ window.onload = function init()
         
         str = "Status: Changing B Value in Shader";
         statChanger();
-        setTimeout(1000);
+        setTimeout(delay);
 
         let r = document.getElementById("rbutton");
         let g = document.getElementById("gbutton");

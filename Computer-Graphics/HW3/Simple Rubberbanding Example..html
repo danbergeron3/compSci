@@ -1,0 +1,108 @@
+
+<!-- saved from url=(0201)https://alt-5f9c84db7d38a.blackboard.com/bbcswebdav/pid-2740795-dt-content-rid-28447715_1/courses/L3330-3977/prog3.html?one_hash=9B5A5D796E406B54EA38D83592461EFA&f_hash=36AEF3BD518F9ECBA200BB09EC3157D1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link href="./Simple Rubberbanding Example._files/mathcont.css" rel="stylesheet" type="text/css">
+<meta name="description" content="Canvas with rubber band selection box.">
+<meta name="keywords" content="canvas, rubber band, selection, save, screen, restore, HTML5">
+<title>Simple Rubberbanding Example.</title>
+
+<script language="JavaScript">
+function initialize(){
+
+	//Get the base layercanvas object
+    canvas1 = document.getElementById("layer1");
+
+   	ctx1 = canvas1.getContext("2d");
+	
+	ctx1.fillStyle = "blue";
+
+    ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
+
+	//Get the top layer canvas object
+	canvas2 = document.getElementById("layer2");
+
+	ctx2 = canvas2.getContext("2d");	
+
+	is_down = false;// mouse hasn't been pressed
+}
+
+// callback for mouse down events
+function mouse_down(event) {
+
+	xDown = event.clientX;
+	yDown = event.clientY;
+
+	is_down = true;
+
+	coords = "X: "+ x + " Y: " + y + " is_down = " + is_down;
+
+	document.getElementById("val1").innerHTML = coords;
+}
+
+// callback for mouse move events
+function mouse_move(event) {
+
+	x = event.clientX;
+	y = event.clientY;
+
+	if(is_down)	{
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+		// elastic band
+		ctx2.strokeStyle = "yellow";
+		ctx2.strokeRect(xDown,yDown, x-xDown, y-yDown);
+	}
+
+	coords = "X: "+ x + " Y: " + y +" is_down = " + is_down;	
+	document.getElementById("val2").innerHTML = coords;
+}
+
+
+// callback for mouse up events
+function mouse_up(event) {
+
+	xUp = event.clientX;
+	yUp = event.clientY;
+
+	is_down = false;
+
+	ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+	coords = "X: "+ xUp + " Y: " + yUp +" is_down = " + is_down;
+
+	document.getElementById("val3").innerHTML = coords;
+}
+
+</script>
+
+</head>
+
+<body onload="initialize()" onmousedown="mouse_down(event)" onmouseup="mouse_up(event)" onmousemove="mouse_move(event)" "="">
+
+<table border="1"><tbody><tr><td width="600" height="600">
+        
+        <canvas id="layer1" style="z-index:1; position:absolute;left:0px;top:0px " width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+
+        <canvas id="layer2" style="z-index:1; position:absolute;left:0px;top:0px " width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+
+</td><td>
+
+<h1>Canvas with rubber band selection box.</h1>
+
+mouse_down:
+<p id="val1">X: 848 Y: 55 is_down = true</p>
+
+mouse_move:
+<p id="val2">X: 1426 Y: 462 is_down = false</p>
+
+mouse_up:
+<p id="val3">X: 1447 Y: 475 is_down = false</p>
+
+
+</td>
+</tr>
+</tbody></table>
+
+
+</body></html>

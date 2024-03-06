@@ -1,0 +1,27 @@
+.wrapper {
+    display: flex;
+}
+
+canvas { 
+    border: 1px solid black; 
+}
+
+.canvas {
+    position: relative;
+    width: 600px;  /* Set the width of the container */
+    height: 600px; /* Set the height of the container */
+}
+
+.canvas canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;   /* Canvas fills the width of the container */
+    height: 100%;  /* Canvas fills the height of the container */
+}
+
+.selection {
+    border: 5px solid crimson;
+    padding-left: 5px;
+    margin-right: 75%;
+}
