@@ -4,6 +4,7 @@ let selectionStart = null;
 let selectedShape = null;
 let curShape = null;
 let isDrawing = false;
+
 function initialize(){
 
     console.log("Loaded");
@@ -427,13 +428,8 @@ function drawShape(shape) {
             ctx1.fillRect(shape.xMin, shape.yMin, shape.width, shape.height);
             break;
         case 'triangle':
-            // Draw triangle (example for an equilateral triangle)
-            ctx1.beginPath();
-            ctx1.moveTo(shape.xMin, shape.yMax);
-            ctx1.lineTo(shape.xMin + shape.width / 2, shape.yMin);
-            ctx1.lineTo(shape.xMin + shape.width, shape.yMax);
-            ctx1.closePath();
-            ctx1.fill();
+            
+            drawTriangle(shape.xMin, shape.yMin, shape.xMax, shape.yMax);
             break;
         case 'polygon':
             // Draw polygon
@@ -479,6 +475,33 @@ function drawRectangle(ctx1, x1, y1, x2, y2) {
     return dimensions;
 }
 
+function drawTriangle(x1, y1, x2, y2) {
+    const length = x2 - x1;
+    const height = y2 - y1;
+
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // Clear canvas
+    ctx1.fillStyle = "red";
+    ctx1.beginPath();
+    ctx1.moveTo(x1, y1);
+    ctx1.lineTo(x1 + length, y1 + height);
+    ctx1.lineTo(x1 - length, y1 + height);
+    ctx1.closePath();
+    ctx1.stroke();
+    ctx1.fill();
+    selectedShape = {
+        type: 'triangle',
+        xMin: x1,
+        xMax: x2,
+        yMin: y1,
+        yMax: y2,
+        area: (length * height)/2, // Area formula for this specific triangle configuration
+        width: length, // Total width from xMin to xMax
+        height: height, // Height as provided
+        centerX: (x1 + (x1 + length) + (x1 - length)) / 3, // Average x of all vertices
+        centerY: (y1 + (y1 + height) + (y1 + height)) / 3 // Average y of all vertices
+    };
+}
+
 function rubberBand(x, y) {
     switch(selectedShape.type) {
         case 'line':
@@ -501,6 +524,27 @@ function rubberBand(x, y) {
             selectedShape.width = dimensions.width;
             selectedShape.height = dimensions.height;
         break;
+        case 'circle':
+            let radius = Math.sqrt(Math.pow(x - selectionStart.x, 2) + Math.pow(y - selectionStart.y, 2));
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+            ctx1.beginPath();
+            ctx1.arc(selectionStart.x, selectionStart.y, radius, 0, Math.PI * 2, false);
+            ctx1.stroke(); 
+            
+            selectedShape.xMin = selectionStart.x - radius;
+            selectedShape.xMax = selectionStart.x + radius;
+            selectedShape.yMin = selectionStart.y - radius;
+            selectedShape.yMax = selectionStart.y + radius;
+            selectedShape.area = Math.PI * Math.pow(radius, 2);
+            selectedShape.radius = radius;
+            selectedShape.centerX = selectionStart.x;
+            selectedShape.centerY = selectionStart.y;
+        break;
+        case 'triangle':
+            drawTriangle(selectionStart.x, selectionStart.y, x, y);
+            
+        break;
+
 
     }
 
@@ -513,6 +557,7 @@ function mouse_down(event) {
         if(mode === 'draw') {
             isDrawing = true;
         }
+
         xDown = coords.x;
         yDown = coords.y;
         
