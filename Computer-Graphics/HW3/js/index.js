@@ -3,7 +3,7 @@ let mode = 'select';
 let selectionStart = null;
 let selectedShape = null;
 let curShape = null;
-
+let isDrawing = false;
 function initialize(){
 
     console.log("Loaded");
@@ -64,6 +64,77 @@ function initialize(){
         initialize(); 
     });
     
+
+    document.getElementById('draw').addEventListener('click', () => {
+        mode = 'draw';
+        let text = `Current Mode: Draw`;
+        document.getElementById('mode').innerText = text;
+    });
+    document.getElementById('drawLineButton').addEventListener('click', () => {
+        
+        selectedShape = {
+            type: 'line',
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,  // since y is the same for both points
+            yMax: 0,
+            area: 0
+        };
+    });
+    document.getElementById('drawCircleButton').addEventListener('click', () => {
+        selectedShape = {
+            type: 'circle',
+            xMin: 0, // centerX - radius
+            xMax: 0, // centerX + radius
+            yMin: 0, // centerY - radius
+            yMax: 0,  // centerY + radius
+            area: 0,
+            radius: 0,
+            centerX: 0,
+            centerY: 0,
+        };
+    });
+    document.getElementById('drawPolygonButton').addEventListener('click', () => {
+        selectedShape = {
+            type: 'polygon',
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,
+            yMax: 0,
+            area: 0,
+            radius: 0, 
+            centerX: 0,
+            centerY: 0,
+            numSides: 0
+        };
+    });
+    document.getElementById('drawRectangleButton').addEventListener('click', () => {
+        selectedShape = {
+            type: 'rectangle',
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,
+            yMax: 0,
+            area: 0, 
+            width: 0,
+            height: 0
+        };
+    });
+    document.getElementById('drawTriangleButton').addEventListener('click', () => {
+        selectedShape = {
+            type: 'triangle',
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,
+            yMax: 0,
+            area: 0,
+            width: 0,
+            height: 0,
+            centerX: 0,
+            centerY: 0
+        };
+    });
+
     document.body.addEventListener('mousedown', mouse_down);
     document.body.addEventListener('mouseup', mouse_up);
     document.body.addEventListener('mousemove', mouse_move);
@@ -119,32 +190,16 @@ function getCanvasRelativeCoords(event, canvas) {
     };
 }
 
-// callback for mouse down events
-function mouse_down(event) {
-    let coords = getCanvasRelativeCoords(event, canvas1);
-    if (coords.x >= 0 && coords.x <= canvas1.width && coords.y >= 0 && coords.y <= canvas1.height) {
-        
-        xDown = coords.x;
-        yDown = coords.y;
-        
-        is_down = true;
-
-        selectionStart = { x: xDown, y: yDown };
-        let displayCoords = "X: "+ xDown + " Y: " + yDown + " is_down = " + is_down;
-
-        document.getElementById("val1").innerHTML = displayCoords;
-    }
-}
-
 
 function calculateScaleFactor(coords) {
     // Implement logic to calculate scale factor based on mouse movement
-    return 1 + (coords.y - yDown) / 1000;
+    return 1 + (coords.y - yDown) / 10000;
 }
 
 function calculateRotationAngle(coords) {
     // Implement logic to calculate rotation angle based on mouse movement
-    return (coords.x - xDown);
+    //return (coords.x - xDown); 
+    return 1;
 }
 
 function applyTransformation(shape, transformType, value) {
@@ -197,10 +252,6 @@ function applyTransformation(shape, transformType, value) {
                 // Assuming the width of the triangle is the length of its base
                 shape.width *= value;
                 shape.height *= value; // Height is scaled accordingly
-                if(shape.width < 50) {
-                    shape.width = 50;
-                }
-                if()
                 // Update bounding box
                 shape.xMin = shape.centerX - shape.width / 2;
                 shape.xMax = shape.centerX + shape.width / 2;
@@ -227,10 +278,123 @@ function applyTransformation(shape, transformType, value) {
             break;
 
         case 'rotate':
-            // Implement rotation logic here
-            // This could be a change in angle or a transformation of points for complex shapes
-            break;
+            if (shape.type === 'line') {
+                const radians = value * Math.PI / 180; // Convert rotation angle to radians
+        
+                // Calculate the center (midpoint) of the line
+                const centerX = (shape.xMin + shape.xMax) / 2;
+                const centerY = (shape.yMin + shape.yMax) / 2;
+        
+                // Define the endpoints of the line
+                let start = { x: shape.xMin, y: shape.yMin };
+                let end = { x: shape.xMax, y: shape.yMax };
+        
+                // Function to rotate a point around the center
+                const rotatePoint = (point) => {
+                    let translatedX = point.x - centerX;
+                    let translatedY = point.y - centerY;
+                    return {
+                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + centerX,
+                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + centerY
+                    };
+                };
+        
+                // Rotate each endpoint
+                start = rotatePoint(start);
+                end = rotatePoint(end);
+        
+                // Update the shape properties
+                shape.xMin = start.x;
+                shape.yMin = start.y;
+                shape.xMax = end.x;
+                shape.yMax = end.y;
+            }
+            if (shape.type === 'rectangle') {
+                const radians = value * Math.PI / 180; // Convert rotation angle to radians
 
+                // Calculate the midpoint (center) of the line
+                const centerX = (shape.xMin + shape.xMax) / 2;
+                const centerY = (shape.yMin + shape.yMax) / 2;
+
+                // Define the endpoints of the line
+                let start = { x: shape.xMin, y: shape.yMin };
+                let end = { x: shape.xMax, y: shape.yMax };
+
+                // Rotate each endpoint around the midpoint
+                const rotatePoint = (point) => {
+                    let translatedX = point.x - centerX;
+                    let translatedY = point.y - centerY;
+                    return {
+                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + centerX,
+                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + centerY
+                    };
+                };
+
+                // Apply rotation
+                start = rotatePoint(start);
+                end = rotatePoint(end);
+
+                // Update shape properties
+                shape.xMin = start.x;
+                shape.yMin = start.y;
+                shape.xMax = end.x;
+                shape.yMax = end.y;
+                
+            }
+            if (shape.type === 'polygon') {
+                const radians = value * Math.PI / 180; // Convert rotation angle to radians
+        
+                // Calculate vertices of the polygon
+                let vertices = [];
+                for (let i = 0; i < shape.numSides; i++) {
+                    const angle = 2 * Math.PI / shape.numSides * i;
+                    const x = shape.centerX + shape.radius * Math.cos(angle);
+                    const y = shape.centerY + shape.radius * Math.sin(angle);
+                    vertices.push({ x, y });
+                }
+                shape.points = vertices;
+                // Rotate each vertex around the center
+                vertices = vertices.map(vertex => {
+                    const translatedX = vertex.x - shape.centerX;
+                    const translatedY = vertex.y - shape.centerY;
+                    return {
+                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + shape.centerX,
+                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + shape.centerY
+                    };
+                });
+        
+                // Update shape properties based on the new vertices
+                shape.xMin = Math.min(...vertices.map(v => v.x));
+                shape.yMin = Math.min(...vertices.map(v => v.y));
+                shape.xMax = Math.max(...vertices.map(v => v.x));
+                shape.yMax = Math.max(...vertices.map(v => v.y));
+                console.log(x +" , "+ y);
+            }
+        break;
+        case 'translate':
+            // The value contains the translation delta (change in position)
+            
+            let rawDeltaX = x - xDown;
+            let rawDeltaY = y - yDown;
+            let normalizationFactor = 100; // Adjust this factor as needed
+            let deltaX = Math.max(-1, Math.min(1, rawDeltaX / normalizationFactor));
+            let deltaY = Math.max(-1, Math.min(1, rawDeltaY / normalizationFactor));
+
+            console.log(`deltax: ${deltaX} deltay: ${deltaY}`)
+            // Adjust the position of the shape
+            shape.xMin += deltaX;
+            shape.xMax += deltaX;
+            shape.yMin += deltaY;
+            shape.yMax += deltaY;
+        
+            // For shapes like circles, update their center positions
+            if (shape.type === 'circle' || shape.type === 'polygon') {
+                shape.centerX += deltaX;
+                shape.centerY += deltaY;
+            }
+
+    // For other shape types, similar logic can be applied based on their properties
+        break;
         // Add other cases like 'translate' if needed
     }
 }
@@ -274,11 +438,12 @@ function drawShape(shape) {
         case 'polygon':
             // Draw polygon
             ctx1.beginPath();
-            const numSides = 5;
+            const numSides = shape.numSides;
             for (let i = 0; i <= numSides; i++) {
                 const angle = 2 * Math.PI / numSides * i;
                 const x = shape.centerX + shape.radius * Math.cos(angle);
                 const y = shape.centerY + shape.radius * Math.sin(angle);
+                
                 if (i === 0) {
                     ctx1.moveTo(x, y);
                 } else {
@@ -291,14 +456,87 @@ function drawShape(shape) {
     }
 }
 
+function drawLine(ctx1, x1, y1, x2, y2) {
+    ctx1.beginPath();
+    ctx1.moveTo(x1, y1);
+    ctx1.lineTo(x2, y2);
+    ctx1.stroke();
+    
+}
+
+function drawRectangle(ctx1, x1, y1, x2, y2) {
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // Clear the canvas
+    ctx1.beginPath();
+    var width = x2 - x1;
+    var height = y2 - y1;
+    ctx1.rect(x1, y1, width, height);
+    ctx1.stroke();
+    let dimensions =  {
+        height: height,
+        width: width
+    };
+    ctx1.fill();
+    return dimensions;
+}
+
+function rubberBand(x, y) {
+    switch(selectedShape.type) {
+        case 'line':
+            drawLine(ctx1, selectionStart.x, selectionStart.y, x, y);
+        
+            selectedShape.xMin = selectionStart.x;
+            selectedShape.xMax = x;
+            selectedShape.yMin = selectionStart.y;
+            selectedShape.yMax = y;
+            area = 0;
+
+        break;
+        case 'rectangle':
+            let dimensions = drawRectangle(ctx1, selectionStart.x, selectionStart.y, x, y);
+            selectedShape.xMin = selectionStart.x;
+            selectedShape.xMax = x;
+            selectedShape.yMin = selectionStart.y;
+            selectedShape.yMax = y;
+            selectedShape.area = dimensions.height * dimensions.width;
+            selectedShape.width = dimensions.width;
+            selectedShape.height = dimensions.height;
+        break;
+
+    }
+
+}
+
+// callback for mouse down events
+function mouse_down(event) {
+    let coords = getCanvasRelativeCoords(event, canvas1);
+    if (coords.x >= 0 && coords.x <= canvas1.width && coords.y >= 0 && coords.y <= canvas1.height) {
+        if(mode === 'draw') {
+            isDrawing = true;
+        }
+        xDown = coords.x;
+        yDown = coords.y;
+        
+        is_down = true;
+
+        selectionStart = { x: xDown, y: yDown };
+        let displayCoords = "X: "+ xDown + " Y: " + yDown + " is_down = " + is_down;
+
+        document.getElementById("val1").innerHTML = displayCoords;
+    }
+}
+
+
 // callback for mouse move events
 function mouse_move(event) {
     let coords = getCanvasRelativeCoords(event, canvas1);
     x = coords.x;
     y = coords.y;
     // console.log("mouse down:" + is_down + "shape: " + selectedShape);
-    
-    if (is_down && curShape && mode != 'select') {
+    if (isDrawing && is_down) { // Clears the canvas
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height)
+        rubberBand(x,y);
+    }
+    if (is_down && curShape && mode != 'select' && mode != 'draw') {
         
         if (mode === 'scale') {
             let scaleFactor = calculateScaleFactor(coords);
@@ -309,7 +547,8 @@ function mouse_move(event) {
         } else if (mode === 'rotateOrigin') {
 
         } else if (mode === 'translate') {
-
+            
+            applyTransformation(selectedShape, 'translate', 0);
         }
         redrawCanvas(selectedShape);
     
@@ -331,8 +570,16 @@ function mouse_move(event) {
 function mouse_up(event) {
     
     var coords = getCanvasRelativeCoords(event, canvas1);
+    
     xUp = coords.x;
     yUp = coords.y;
+
+    if (isDrawing) {
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height)
+        rubberBand(xUp, yUp);
+        isDrawing = false;
+    }
+
     if (xUp >= 0 && xUp <= canvas1.width && yUp >= 0 && yUp <= canvas1.height) {
         is_down = false;
 
@@ -379,8 +626,8 @@ function quickDrawShape(shape) {
                 xMax: Math.max(100, 50),
                 yMin: 75,  // since y is the same for both points
                 yMax: 75,
-                area: Math.sqrt(Math.pow(100 - 50, 2) + Math.pow(75 - 75, 2))
-            }
+                area: c0
+            };
             break;
         case 'circle':
             ctx1.fillStyle = "red";
@@ -403,13 +650,13 @@ function quickDrawShape(shape) {
             break;
         case 'rectangle':
             ctx1.fillStyle = "red";
-            ctx1.fillRect(20, 20, 150, 100);
+            ctx1.fillRect(200, 200, 150, 100);
             selectedShape = {
                 type: 'rectangle',
-                xMin: 20,
-                xMax: 20 + 150,
-                yMin: 20,
-                yMax: 20 + 100,
+                xMin: 200,
+                xMax: 200 + 150,
+                yMin: 200,
+                yMax: 200 + 100,
                 area: 150 * 100, 
                 width: 150,
                 height: 100
