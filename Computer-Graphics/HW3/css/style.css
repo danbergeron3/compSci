@@ -22,8 +22,7 @@ canvas {
 
 .selection {
     border: 5px solid crimson;
-    padding-left: 5px;
-    margin-right: 75%;
+    max-width: 25%;
 }
 
 th {

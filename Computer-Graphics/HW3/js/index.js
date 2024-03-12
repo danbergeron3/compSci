@@ -44,11 +44,6 @@ function initialize(){
         let text = `Current Mode: Rotate`;
         document.getElementById('mode').innerText = text;
     });
-    document.getElementById('rotateOriginButton').addEventListener('click', function() { 
-        mode = 'rotateOrigin';
-        let text = `Current Mode: Rotate Origin`;
-        document.getElementById('mode').innerText = text;
-    });
     document.getElementById('select').addEventListener('click', function() { 
         mode = 'select';
         let text = `Current Mode: Select`;
@@ -145,11 +140,6 @@ function initialize(){
 
     ctx1 = canvas1.getContext("2d");
     
-    //ctx1.fillStyle = "grey";
-
-    //ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
-
-    //Get the top layer canvas object
     canvas2 = document.getElementById("layer2");
 
     ctx2 = canvas2.getContext("2d");	
@@ -198,9 +188,9 @@ function calculateScaleFactor(coords) {
 }
 
 function calculateRotationAngle(coords) {
-    // Implement logic to calculate rotation angle based on mouse movement
-    //return (coords.x - xDown); 
-    return 1;
+    let deltaY = coords.y - yDown; // Assuming rotation based on vertical mouse movement
+    let angle = deltaY * 0.5; // Adjust sensitivity as needed
+    return angle;
 }
 
 function applyTransformation(shape, transformType, value) {
@@ -251,14 +241,24 @@ function applyTransformation(shape, transformType, value) {
             // For triangles:
             if (shape.type === 'triangle') {
                 // Assuming the width of the triangle is the length of its base
-                shape.width *= value;
-                shape.height *= value; // Height is scaled accordingly
-                // Update bounding box
-                shape.xMin = shape.centerX - shape.width / 2;
-                shape.xMax = shape.centerX + shape.width / 2;
-                shape.yMax = shape.centerY + shape.height;
+                // Estimate centroid (center point) of the triangle
+                const currentCentroidX = (shape.xMin + shape.xMax) / 2;
+                const currentCentroidY = shape.yMax;  // Assuming yMax is the base of the triangle
+
+                // Scale width and height
+                const oldWidth = shape.xMax - shape.xMin;
+                const oldHeight = shape.yMax - shape.yMin; // Assuming yMin is at the top of the triangle
+                const newWidth = oldWidth * value;
+                const newHeight = oldHeight * value;
+
+                // Reposition bounding box to keep the centroid in the same position
+                shape.xMin = currentCentroidX - newWidth / 2;
+                shape.xMax = currentCentroidX + newWidth / 2;
+                shape.yMax = currentCentroidY;  // yMax remains the same as the base of the triangle
+                shape.yMin = currentCentroidY - newHeight; // Adjust yMin based on the new height
+
                 // Update area
-                shape.area = (shape.width * shape.height) / 2;
+                shape.area = (newWidth * newHeight) / 2
             }
 
             // For polygons:
@@ -311,40 +311,67 @@ function applyTransformation(shape, transformType, value) {
                 shape.yMax = end.y;
             }
             if (shape.type === 'rectangle') {
+                console.log('rotate shape here')
                 const radians = value * Math.PI / 180; // Convert rotation angle to radians
 
-                // Calculate the midpoint (center) of the line
-                const centerX = (shape.xMin + shape.xMax) / 2;
-                const centerY = (shape.yMin + shape.yMax) / 2;
+                // Calculate the center point of the rectangle
+                const centerX = shape.centerX;
+                const centerY = shape.centerY;
 
-                // Define the endpoints of the line
-                let start = { x: shape.xMin, y: shape.yMin };
-                let end = { x: shape.xMax, y: shape.yMax };
-
-                // Rotate each endpoint around the midpoint
-                const rotatePoint = (point) => {
-                    let translatedX = point.x - centerX;
-                    let translatedY = point.y - centerY;
+                // Function to rotate a point around the center
+                const rotatePoint = (x, y) => {
+                    let translatedX = x - centerX;
+                    let translatedY = y - centerY;
                     return {
                         x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + centerX,
                         y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + centerY
                     };
                 };
 
-                // Apply rotation
-                start = rotatePoint(start);
-                end = rotatePoint(end);
+                // Calculate the corners of the rectangle before rotation
+                let halfWidth = shape.width / 2;
+                let halfHeight = shape.height / 2;
+                let corners = [
+                    { x: centerX - halfWidth, y: centerY - halfHeight }, // Top-left
+                    { x: centerX + halfWidth, y: centerY - halfHeight }, // Top-right
+                    { x: centerX - halfWidth, y: centerY + halfHeight }, // Bottom-left
+                    { x: centerX + halfWidth, y: centerY + halfHeight }  // Bottom-right
+                ];
 
-                // Update shape properties
-                shape.xMin = start.x;
-                shape.yMin = start.y;
-                shape.xMax = end.x;
-                shape.yMax = end.y;
+                // Rotate each corner around the center
+                shape.corners = corners.map(corner => rotatePoint(corner.x, corner.y));
+                console.log('Corners:', shape.corners.map(corner => `(${corner.x.toFixed(2)}, ${corner.y.toFixed(2)})`).join(', '));
+                // Update shape properties based on the new corners
                 
+                
+            }
+            if (shape.type === 'triangle') {
+                const radians = value * Math.PI / 180; // Convert rotation angle to radians
+
+                // Calculate the vertices of the triangle
+                const vertex1 = { x: shape.centerX, y: shape.centerY - shape.height }; // Top vertex
+                const vertex2 = { x: shape.centerX - shape.width / 2, y: shape.centerY }; // Bottom left
+                const vertex3 = { x: shape.centerX + shape.width / 2, y: shape.centerY }; // Bottom right
+
+                // Function to rotate a point around the center
+                const rotatePoint = (x, y, centerX, centerY) => {
+                    let translatedX = x - centerX;
+                    let translatedY = y - centerY;
+                    return {
+                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + centerX,
+                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + centerY
+                    };
+                };
+
+                // Rotate each vertex of the triangle
+                shape.vertex1 = rotatePoint(vertex1.x, vertex1.y, shape.centerX, shape.centerY);
+                shape.vertex2 = rotatePoint(vertex2.x, vertex2.y, shape.centerX, shape.centerY);
+                shape.vertex3 = rotatePoint(vertex3.x, vertex3.y, shape.centerX, shape.centerY);
+
             }
             if (shape.type === 'polygon') {
                 const radians = value * Math.PI / 180; // Convert rotation angle to radians
-        
+
                 // Calculate vertices of the polygon
                 let vertices = [];
                 for (let i = 0; i < shape.numSides; i++) {
@@ -353,47 +380,42 @@ function applyTransformation(shape, transformType, value) {
                     const y = shape.centerY + shape.radius * Math.sin(angle);
                     vertices.push({ x, y });
                 }
-                shape.points = vertices;
-                // Rotate each vertex around the center
-                vertices = vertices.map(vertex => {
-                    const translatedX = vertex.x - shape.centerX;
-                    const translatedY = vertex.y - shape.centerY;
+
+                // Function to rotate a point around the center
+                const rotatePoint = (x, y, centerX, centerY) => {
+                    let translatedX = x - centerX;
+                    let translatedY = y - centerY;
                     return {
-                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + shape.centerX,
-                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + shape.centerY
+                        x: translatedX * Math.cos(radians) - translatedY * Math.sin(radians) + centerX,
+                        y: translatedX * Math.sin(radians) + translatedY * Math.cos(radians) + centerY
                     };
-                });
-        
-                // Update shape properties based on the new vertices
-                shape.xMin = Math.min(...vertices.map(v => v.x));
-                shape.yMin = Math.min(...vertices.map(v => v.y));
-                shape.xMax = Math.max(...vertices.map(v => v.x));
-                shape.yMax = Math.max(...vertices.map(v => v.y));
-                console.log(x +" , "+ y);
+                };
+
+                // Rotate each vertex
+                shape.vertices = vertices.map(vertex => rotatePoint(vertex.x, vertex.y, shape.centerX, shape.centerY));
             }
         break;
         case 'translate':
-            // The value contains the translation delta (change in position)
-            
-            let rawDeltaX = x - xDown;
-            let rawDeltaY = y - yDown;
-            let normalizationFactor = 100; // Adjust this factor as needed
-            let deltaX = Math.max(-1, Math.min(1, rawDeltaX / normalizationFactor));
-            let deltaY = Math.max(-1, Math.min(1, rawDeltaY / normalizationFactor));
+            // Calculate the new center position
+            let newCenterX = x;
+            let newCenterY = y;
 
-            console.log(`deltax: ${deltaX} deltay: ${deltaY}`)
+            // Calculate the deltas needed to move the shape's center to the new position
+            let deltaX = newCenterX - shape.centerX;
+            let deltaY = newCenterY - shape.centerY;
+
+            console.log(`deltaX: ${deltaX} deltaY: ${deltaY}`);
+
             // Adjust the position of the shape
             shape.xMin += deltaX;
             shape.xMax += deltaX;
             shape.yMin += deltaY;
             shape.yMax += deltaY;
-        
-            // For shapes like circles, update their center positions
-            if (shape.type === 'circle' || shape.type === 'polygon') {
-                shape.centerX += deltaX;
-                shape.centerY += deltaY;
-            }
 
+            // Update the center position of the shape
+            shape.centerX += deltaX;
+            shape.centerY += deltaY;
+            
     // For other shape types, similar logic can be applied based on their properties
         break;
         // Add other cases like 'translate' if needed
@@ -403,9 +425,23 @@ function applyTransformation(shape, transformType, value) {
 function redrawCanvas(shape) {
     ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
 
-    
-    // draw shape on canvas 
-    drawShape(shape);
+    if (mode === 'rotate') {
+        if (shape.type === 'rectangle'){
+            drawRotatedRectangle(ctx1, shape);
+        } else if (shape.type === 'triangle') {
+            ctx1.beginPath();
+            ctx1.moveTo(shape.vertex1.x, shape.vertex1.y);
+            ctx1.lineTo(shape.vertex2.x, shape.vertex2.y);
+            ctx1.lineTo(shape.vertex3.x, shape.vertex3.y);
+            ctx1.closePath(); // Closes the path back to the first vertex
+            ctx1.stroke();
+        } else if (shape.type === 'polygon') {
+            drawRotatedPolygon(ctx1, shape);       
+        }
+    } else {
+        // draw other shapes
+        drawShape(shape);
+    }
 }
 
 function drawShape(shape) {
@@ -475,6 +511,18 @@ function drawRectangle(ctx1, x1, y1, x2, y2) {
     return dimensions;
 }
 
+function drawRotatedPolygon(ctx, shape) {
+    if (shape.type === 'polygon' && shape.vertices) {
+        ctx.beginPath();
+        ctx.moveTo(shape.vertices[0].x, shape.vertices[0].y);
+        for (let i = 1; i < shape.vertices.length; i++) {
+            ctx.lineTo(shape.vertices[i].x, shape.vertices[i].y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+}
+
 function drawTriangle(x1, y1, x2, y2) {
     const length = x2 - x1;
     const height = y2 - y1;
@@ -506,15 +554,18 @@ function rubberBand(x, y) {
     switch(selectedShape.type) {
         case 'line':
             drawLine(ctx1, selectionStart.x, selectionStart.y, x, y);
-        
+            
             selectedShape.xMin = selectionStart.x;
             selectedShape.xMax = x;
             selectedShape.yMin = selectionStart.y;
             selectedShape.yMax = y;
+            selectedShape.centerX = (selectionStart.x + x) / 2;
+            selectedShape.centerY = (selectionStart.y + y) / 2;
             area = 0;
 
         break;
         case 'rectangle':
+            
             let dimensions = drawRectangle(ctx1, selectionStart.x, selectionStart.y, x, y);
             selectedShape.xMin = selectionStart.x;
             selectedShape.xMax = x;
@@ -523,6 +574,9 @@ function rubberBand(x, y) {
             selectedShape.area = dimensions.height * dimensions.width;
             selectedShape.width = dimensions.width;
             selectedShape.height = dimensions.height;
+            selectedShape.centerX = (selectedShape.xMin + selectedShape.xMax) / 2;
+            selectedShape.centerY = (selectedShape.yMin + selectedShape.yMax) / 2;
+        
         break;
         case 'circle':
             let radius = Math.sqrt(Math.pow(x - selectionStart.x, 2) + Math.pow(y - selectionStart.y, 2));
@@ -541,14 +595,49 @@ function rubberBand(x, y) {
             selectedShape.centerY = selectionStart.y;
         break;
         case 'triangle':
-            drawTriangle(selectionStart.x, selectionStart.y, x, y);
-            
+            drawTriangle(selectionStart.x, selectionStart.y, x, y);     
         break;
+        case 'polygon':
+            const numSides = 5;
+            let dx = x - selectionStart.x;
+            let dy = y - selectionStart.y;
+            let rad = Math.sqrt(dx * dx + dy * dy); // Dynamic radius based on mouse position
 
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // Clear the canvas
 
+            ctx1.beginPath();
+            for (let i = 0; i <= numSides; i++) {
+                const angle = 2 * Math.PI / numSides * i;
+                const px = selectionStart.x + rad * Math.cos(angle);
+                const py = selectionStart.y + rad * Math.sin(angle);
+                if (i === 0) {
+                    ctx1.moveTo(px, py);
+                } else {
+                    ctx1.lineTo(px, py);
+                }
+            }
+            ctx1.closePath();
+            ctx1.stroke();
+
+            let polygonArea = (numSides * Math.pow(rad, 2) * Math.sin((2 * Math.PI) / numSides)) / 2;
+
+            selectedShape = {
+                type: 'polygon',
+                xMin: selectionStart.x - rad,
+                xMax: selectionStart.x + rad,
+                yMin: selectionStart.y - rad,
+                yMax: selectionStart.y + rad,
+                area: polygonArea,
+                radius: rad,
+                centerX: selectionStart.x,
+                centerY: selectionStart.y,
+                numSides: numSides
+            };
+        break;
     }
-
 }
+
+
 
 // callback for mouse down events
 function mouse_down(event) {
@@ -589,11 +678,11 @@ function mouse_move(event) {
         } else if (mode === 'rotate') {
             let angle = calculateRotationAngle(coords);
             applyTransformation(selectedShape, 'rotate', angle);
-        } else if (mode === 'rotateOrigin') {
-
-        } else if (mode === 'translate') {
             
+        } else if (mode === 'translate') {
+            // Check if the bounding box of the shape intersects with the selection box
             applyTransformation(selectedShape, 'translate', 0);
+            
         }
         redrawCanvas(selectedShape);
     
@@ -647,6 +736,26 @@ function mouse_up(event) {
    
 }
 
+function drawRotatedRectangle(ctx, shape) {
+    console.log("rotating rec")
+    if (shape.type === 'rectangle' && shape.corners && shape.corners.length === 4) {
+        ctx.beginPath();
+        // Move to the first corner
+        ctx.moveTo(shape.corners[0].x, shape.corners[0].y);
+
+        ctx.lineTo(shape.corners[2].x, shape.corners[2].y);
+        ctx.lineTo(shape.corners[3].x, shape.corners[3].y);
+        ctx.lineTo(shape.corners[1].x, shape.corners[1].y);
+
+        // Close the path to complete the rectangle
+        ctx.closePath();
+
+        // Stroke or fill the rectangle as desired
+        ctx.stroke(); // To only draw the outline
+        // ctx.fill(); // To fill the rectangle
+    }
+}
+
 function quickDrawShape(shape) {
     console.log(`drawShape called with shape: ${shape}`);
     ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
@@ -665,13 +774,16 @@ function quickDrawShape(shape) {
             ctx1.moveTo(100, 75); // Move to the starting point
             ctx1.lineTo(50, 75);     // Draw a line to the ending point
             ctx1.stroke();
+
             selectedShape = {
                 type: 'line',
                 xMin: Math.min(100, 50),
                 xMax: Math.max(100, 50),
                 yMin: 75,  // since y is the same for both points
                 yMax: 75,
-                area: c0
+                area: 0,
+                centerX: (100 + 50) / 2,
+                centerY: 75
             };
             break;
         case 'circle':
@@ -696,6 +808,7 @@ function quickDrawShape(shape) {
         case 'rectangle':
             ctx1.fillStyle = "red";
             ctx1.fillRect(200, 200, 150, 100);
+
             selectedShape = {
                 type: 'rectangle',
                 xMin: 200,
@@ -704,7 +817,9 @@ function quickDrawShape(shape) {
                 yMax: 200 + 100,
                 area: 150 * 100, 
                 width: 150,
-                height: 100
+                height: 100,
+                centerX: (200 + (200 + 150)) / 2,
+                centerY: (200 + (200 + 100)) / 2 
             };
             break;
         case 'triangle':

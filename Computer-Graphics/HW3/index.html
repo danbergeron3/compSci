@@ -11,33 +11,8 @@
 </head>
 <body onload="initialize()" >
     <div class="wrapper">
-        <div class="table1">
-            <table border="1">
-                <tbody>
-                    <tr>
-                        <td>
-                            <h1>Canvas with rubber band selection box.</h1>
-
-                            mouse_down:
-                            <p id="val1">X: 848 Y: 55 is_down = true</p>
-
-                            mouse_move:
-                            <p id="val2">X: 1426 Y: 462 is_down = false</p>
-
-                            mouse_up:
-                            <p id="val3">X: 1447 Y: 475 is_down = false</p>
-
-
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="canvas" border="1">
-            <canvas id="layer1" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
-            <canvas id="layer2" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
-        </div>
-        <div class="table2">
+        <div class="selection">
+            
             <table>
                 <th>Quick Draw</th>
                 <th>Shape Draw</th>
@@ -66,18 +41,46 @@
                 <tr>
                     <td><button id="triangleButton">Triangle</button></td>
                     <td><button id="drawTriangleButton">Triangle</button></td>
-                    <td><button id="rotateOriginButton">RotateOrigin</button></td>
                 </tr>
                 <tr>
                     <td><button id="polygonButton">Polygon</button></td>  
                     <td><button id="drawPolygonButton">Polygon</button></td> 
                 </tr>
             </table>
+            <h2 id="mode">Current Mode: Select</h2>
+            <h3 id="selectedShapeInfo">Currently Selected: None</h3>
+        </div>
+       
+        <div class="canvas" border="1">
+            <canvas id="layer1" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+            <canvas id="layer2" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+        </div>
+        <div class="table2">
+            
+            <div class="table1">
+                <table border="1">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h1>Canvas with rubber banding and Translations.</h1>
+    
+                                mouse_down:
+                                <p id="val1">X: 848 Y: 55 is_down = true</p>
+    
+                                mouse_move:
+                                <p id="val2">X: 1426 Y: 462 is_down = false</p>
+    
+                                mouse_up:
+                                <p id="val3">X: 1447 Y: 475 is_down = false</p>
+    
+    
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="selection">
-        <h2 id="mode">Current Mode: Select</h2>
-        <h3 id="selectedShapeInfo">Currently Selected: None</h3>
-    </div>
+    
 </body>
 </html>
