@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HW3</title>
+    <style>
+        /* Basic styling */
+        canvas { border: 1px solid black; }
+    </style>
+    <script src="./js/index.js"></script> 
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body onload="initialize()" >
+    <div class="wrapper">
+        <div class="selection">
+            
+            <table>
+                <th>Quick Draw</th>
+                <th>Shape Draw</th>
+                <th>Transformations</th>
+                <th>Window Modes</th>
+                <tr>
+                    <td><button id="lineButton">Line</button></td>
+                    <td><button id="drawLineButton">Line</button></td>
+                    <td><button id="translateButton">Translate</button></td>
+                    <td><button id="select">Select</button></td>
+                    
+                    
+                </tr>
+                <tr>
+                    <td><button id="circleButton">Circle</button></td>
+                    <td><button id="drawCircleButton">Circle</button></td>
+                    <td><button id="scaleButton">Scale</button></td>
+                    <td><button id="draw">Draw</button></td>
+                </tr>
+                <tr>
+                    <td><button id="rectangleButton">Rectangle</button></td>
+                    <td><button id="drawRectangleButton">Rectangle</button></td>
+                    <td><button id="rotateButton">Rotate</button></td>
+                    <td><button id="reset">Reset</button></td>
+                </tr>
+                <tr>
+                    <td><button id="triangleButton">Triangle</button></td>
+                    <td><button id="drawTriangleButton">Triangle</button></td>
+                </tr>
+                <tr>
+                    <td><button id="polygonButton">Polygon</button></td>  
+                    <td><button id="drawPolygonButton">Polygon</button></td> 
+                </tr>
+            </table>
+            <h2 id="mode">Current Mode: Select</h2>
+            <h3 id="selectedShapeInfo">Currently Selected: None</h3>
+        </div>
+       
+        <div class="canvas" border="1">
+            <canvas id="layer1" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+            <canvas id="layer2" width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+        </div>
+        <div class="table2">
+            
+            <div class="table1">
+                <table border="1">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h1>Canvas with rubber banding and Translations.</h1>
+    
+                                mouse_down:
+                                <p id="val1">X: 848 Y: 55 is_down = true</p>
+    
+                                mouse_move:
+                                <p id="val2">X: 1426 Y: 462 is_down = false</p>
+    
+                                mouse_up:
+                                <p id="val3">X: 1447 Y: 475 is_down = false</p>
+    
+    
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
