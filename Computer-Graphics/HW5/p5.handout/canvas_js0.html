@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="200" height="100" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+
+var i;
+for (i = 0; i < 200; i++) { 
+    ctx.fillRect(i,i,1,1); // fill in the pixel at (10,10)
+}
+</script>
+
+</body>
+</html>
+

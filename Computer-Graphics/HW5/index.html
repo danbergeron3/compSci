@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2D Shapes and Curves Drawing</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+
+        #canvas {
+            flex: 1;
+            border: 1px solid #000;
+        }
+
+        .control-panel {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .control-panel h2 {
+            margin: 10px 0;
+        }
+
+        .control-panel div {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <div class="control-panel">
+        <!-- Control Panel for Lines -->
+        <div>
+            <h2>Lines</h2>
+            <input type="number" id="x1" placeholder="x1">
+            <input type="number" id="y1" placeholder="y1">
+            <input type="number" id="x2" placeholder="x2">
+            <input type="number" id="y2" placeholder="y2">
+            <button onclick="DDA(parseInt(document.getElementById('x1').value), 
+            parseInt(document.getElementById('y1').value), 
+            parseInt(document.getElementById('x2').value), 
+            parseInt(document.getElementById('y2').value))">DDA Line</button>
+
+        </div>
+
+        <!-- Control Panel for Circle -->
+        <div>
+            <h2>Circle</h2>
+            <input type="number" id="radius" placeholder="Radius">
+            <button id="drawCircleButton">Draw Circle</button>
+
+
+        </div>
+
+        <!-- Control Panel for Ellipse -->
+        <div>
+            <h2>Ellipse</h2>
+            <input type="number" id="ellipseA" placeholder="Semi-major axis (a)">
+            <input type="number" id="ellipseB" placeholder="Semi-minor axis (b)">
+            <button id="drawEllipseButton">Midpoint Ellipse</button>
+        </div>
+
+        <!-- Control Panel for Curves -->
+        <div>
+            <h2>Curves</h2>
+            <div>
+                <h3>Hermite Curve</h3>
+                <input type="number" id="hermiteX1" placeholder="Start Point X">
+                <input type="number" id="hermiteY1" placeholder="Start Point Y">
+                <input type="number" id="hermiteX4" placeholder="End Point X">
+                <input type="number" id="hermiteY4" placeholder="End Point Y">
+                <input type="number" id="hermiteRX1" placeholder="Tangent Vector at Start X">
+                <input type="number" id="hermiteRY1" placeholder="Tangent Vector at Start Y">
+                <input type="number" id="hermiteRX4" placeholder="Tangent Vector at End X">
+                <input type="number" id="hermiteRY4" placeholder="Tangent Vector at End Y">
+                <input type="number" id="hermiteSegments" placeholder="Number of Segments" value="1000">
+                <button id="drawHermiteButton">Draw Hermite Curve</button>
+            </div>
+            <div>
+                <h3>Bezier Curve</h3>
+                <input type="number" id="bezierX1" placeholder="Start X">
+                <input type="number" id="bezierY1" placeholder="Start Y">
+                <input type="number" id="bezierX2" placeholder="Control Point 1 X">
+                <input type="number" id="bezierY2" placeholder="Control Point 1 Y">
+                <input type="number" id="bezierX3" placeholder="Control Point 2 X">
+                <input type="number" id="bezierY3" placeholder="Control Point 2 Y">
+                <input type="number" id="bezierX4" placeholder="End Point X">
+                <input type="number" id="bezierY4" placeholder="End Point Y">
+                <input type="number" id="bezierSegments" placeholder="Number of Segments" value="1000">
+                <button id="bezierButton">Draw Bezier Curve</button>
+            <div>
+            <div>
+                <h3>B-Spline Curve</h3>
+                <input type="number" id="splineX1" placeholder="Control Point 2 X">
+                <input type="number" id="splineY1" placeholder="Control Point 1 Y">
+                <input type="number" id="splineX2" placeholder="Control Point 2 X">
+                <input type="number" id="splineY2" placeholder="Control Point 2 Y">
+                <input type="number" id="splineX3" placeholder="Control Point 3 X">
+                <input type="number" id="splineY3" placeholder="Control Point 3 Y">
+                <input type="number" id="splineX4" placeholder="Control Point 4 X">
+                <input type="number" id="splineY4" placeholder="Control Point 4 Y">
+                <input type="number" id="splineSegments" placeholder="Number of Segments" value="1000">
+                <button id="drawSplineButton">Draw B-Spline Curve</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to External JavaScript Files -->
+    <script src="index.js"></script>
+</body>
+</html>
