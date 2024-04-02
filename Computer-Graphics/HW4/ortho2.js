@@ -41,10 +41,10 @@ const up = vec3(0.0, 1.0, 0.0);
 
 function quad(a, b, c, d) {
     var vertices = [
-        vec4( -0.25, -0.25,  0.25, 1.0 ), // <---
-        vec4( -0.25,  0.25,  0.25, 1.0 ), // <---
-        vec4(  0.25,  0.25,  0.25, 1.0 ), // <---
-        vec4(  0.25, -0.25,  0.25, 1.0 ), // <---
+        vec4( -0.25, -0.25,  0.25, 1.0 ), 
+        vec4( -0.25,  0.25,  0.25, 1.0 ), 
+        vec4(  0.25,  0.25,  0.25, 1.0 ), 
+        vec4(  0.25, -0.25,  0.25, 1.0 ), 
         vec4( -0.25, -0.25, -0.25, 1.0 ),
         vec4( -0.25,  0.25, -0.25, 1.0 ),
         vec4(  0.25,  0.25, -0.25, 1.0 ),
@@ -75,8 +75,8 @@ function quad(a, b, c, d) {
 }
 function colorTriangle()
 {
-    triangle( 0, 1, 2, 0 ); // triangle - black
-    triangle( 3, 4, 5, 1 ); // triangle - green
+    triangle( 0, 1, 2, 0 ); // black
+    triangle( 3, 4, 5, 1 ); // green
     triangle( 0, 3, 2, 2 ); // quad
     triangle( 2, 3, 5, 2 ); // quad - red
     triangle( 1, 0, 3, 3 ); // quad
@@ -87,14 +87,13 @@ function colorTriangle()
 function triangle(a, b, c, surface_number) 
 {
 	// x y z 
-	// I make 
     var vertices = [
-        vec4(  0.0,  1.0/2,  0.25, 1.0 ), // 0 <---
-        vec4( -0.25,  0.25,  0.25, 1.0 ), // 1 <---
-        vec4(  0.25,  0.25,  0.25, 1.0 ), // 2 <---
-        vec4(  0.0,  1.0/2, -0.25, 1.0 ), // 3 <---
-        vec4( -0.25,  0.25, -0.25, 1.0 ), // 4 <---
-        vec4(  0.25,  0.25, -0.25, 1.0 )  // 5 <---
+        vec4(  0.0,  1.0/2,  0.25, 1.0 ),
+        vec4( -0.25,  0.25,  0.25, 1.0 ),
+        vec4(  0.25,  0.25,  0.25, 1.0 ),
+        vec4(  0.0,  1.0/2, -0.25, 1.0 ), 
+        vec4( -0.25,  0.25, -0.25, 1.0 ), 
+        vec4(  0.25,  0.25, -0.25, 1.0 )
     ];
 
 	var vertexColors = [
@@ -104,11 +103,7 @@ function triangle(a, b, c, surface_number)
         [ 0.0, 0.0, 0.8, 1.0 ]   // blue
     ];
 
-    // We need to partition the quad into two triangles in order for
-    // WebGL to be able to render it.  In this case, we create two
-    // triangles from the quad indices
     
-    //vertex color assigned by the index of the vertex
     
     var indices = [ a, b, c ];
 
@@ -133,9 +128,6 @@ function colorCube()
     quad( 5, 4, 0, 1 );
 }
 
-function house() {
-
-}
 
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
@@ -223,7 +215,7 @@ window.onload = function init() {
         animateCamera(pathPoints);
     };
 
-    render();
+    //render();
 }
 
 
@@ -245,7 +237,7 @@ var render = function() {
 var render2 = function(eye) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Use the newEye parameter for the camera position
+    // Use the eye parameter for the camera position
     modelViewMatrix = lookAt(eye, at, up);
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 
@@ -294,11 +286,11 @@ function animateCamera(pathPoints) {
             // Render the scene with the new camera position
             render2(eye);
 
-            // Wait for one second, then request the next frame of the animation
+            // Wait for a second, then request the next frame of the animation
             if (index < pathPoints.length) {
                 setTimeout(function() {
                     requestAnimationFrame(animate);
-                }, 100); // Delay of 1000 milliseconds (1 second)
+                }, 100);
             }
         }
     };
@@ -320,7 +312,6 @@ document.getElementById("animateButton").onclick = function() {
     var linePoints = getLinePoints(lineP1, lineP2, 100);
     var circlePoints = getCirclePoints(circleCenter, circleRadius, 100);
 
-    // Combine line and circle points for full path
     var pathPoints = linePoints.concat(circlePoints);
     
     animateCamera(pathPoints);
