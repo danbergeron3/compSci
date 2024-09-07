@@ -10,6 +10,25 @@ import zlib
 from datetime import datetime
 from fnmatch import fnmatch
 
+class GitRepository (object):
+        """A git repository under the hood"""
+
+        work_tree = None
+        git_directory = None
+        config = None
+
+        def __init__(self, path, force=False):
+               self.work_tree = path
+               self.git_directory = os.path.join(path, ".git")
+               
+               if not (force or os.path.isdir(self.git_directory)):
+                     raise Exception("Not a Git repository %s" % path)
+               
+               # read configuration file in .git/config 
+               self.config = configparser.ConfigParser()
+               cf = repo_file(self, "config")
+
+
 def cmd_add(args):
     print("File added")
 
@@ -53,7 +72,7 @@ def cmd_status(args):
         print("status")
 
 def cmd_tag(args):
-    print("tag")
+        print("tag")
 
 
 def main(argv=sys.argv[1:]): 
@@ -103,24 +122,12 @@ def main(argv=sys.argv[1:]):
 
     # get COMMAND case for bridges function  
     args = argument_parser.parse_args(argv)
-    print(args)
-    match args.command:
-        case "add"          : cmd_add(args)
-        case "cat-file"     : cmd_cat_file(args)
-        case "check-ignore" : cmd_check_ignore(args)
-        case "checkout"     : cmd_checkout(args)
-        case "commit"       : cmd_commit(args)
-        case "hash-object"  : cmd_hash_object(args)
-        case "init"         : cmd_init(args)
-        case "log"          : cmd_log(args)
-        case "ls-files"     : cmd_ls_files(args)
-        case "ls-tree"      : cmd_ls_tree(args)
-        case "rev-parse"    : cmd_rev_parse(args)
-        case "rm"           : cmd_rm(args)
-        case "show-ref"     : cmd_show_ref(args)
-        case "status"       : cmd_status(args)
-        case "tag"          : cmd_tag(args)
-        case _              : print("Bad command.")
+
+     # Call the appropriate function
+    if hasattr(args, 'func'):
+        args.func(args)  # This calls the command's function
+    else:
+        argument_parser.print_help()
 
 
 main()
