@@ -1,5 +1,2 @@
 # Computer Science Work
-Contains current course work
-This content is not intended for duplication only 
-used as a reffrence for future employers as well as 
-serve as a record and tool of my academic pursuits.
+Contains current work, practice and anything code related thats not a complete project 
