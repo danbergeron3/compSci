@@ -12,21 +12,61 @@ from fnmatch import fnmatch
 
 class GitRepository (object):
         """A git repository under the hood"""
-
+        # work tree is the git repository the user interacts with
+        # git directory is .git holding git meta information 
+        # config is config file in .git holding repo configurations
         work_tree = None
         git_directory = None
         config = None
 
+        # given a path will 
         def __init__(self, path, force=False):
                self.work_tree = path
                self.git_directory = os.path.join(path, ".git")
                
+
                if not (force or os.path.isdir(self.git_directory)):
                      raise Exception("Not a Git repository %s" % path)
                
                # read configuration file in .git/config 
                self.config = configparser.ConfigParser()
-               cf = repo_file(self, "config")
+               config_file = repo_file(self, "config")
+               if config_file and os.path.exists(config_file):
+                     self.config.read([config_file])
+               elif not force:
+                     raise Exception("Configuration file missing")
+               
+               if not force:
+                     vers = int(self.config.get("core", "repositoryformatversion"))
+                     if vers != 0:
+                        raise Exception("Unsupported repositoryformatversion") % vers
+        
+def repo_path(repo, *path):
+      """Compute path under repo's gitdir"""
+      return os.path.join(repo.gitdir, *path)
+
+def repo_file(repo, *path, mkdir=False):
+      """Same as repo path but create dirname(*path) if absent. For example 
+      , repo_file(r,  \"refs\", \"remotes\", \"origin\", \"HEAD\") will create
+        .git/refs/remotes/origin."""
+      if repo_dir(repo, *path[:-1], mkdir=mkdir):
+            return repo_path(repo, *path)
+      
+def repo_dir(repo, *path, mkdir=False):
+      """Same as repo_path, but mkdir * path if absent if mkdir."""
+
+      path = repo_path(repo, *path)
+
+      if os.path.exists(path):
+            if (os.path.isdir(path)):
+                return path
+            else:
+                raise Exception("Not a directory %s" % path)
+      if mkdir:
+            os.makedirs(path)
+            return path 
+      else: 
+            return None 
 
 
 def cmd_add(args):
