@@ -42,8 +42,8 @@ class GitRepository (object):
                         raise Exception("Unsupported repositoryformatversion") % vers
         
 def repo_path(repo, *path):
-      """Compute path under repo's gitdir"""
-      return os.path.join(repo.gitdir, *path)
+      """Compute path under repo's git_directory"""
+      return os.path.join(repo.git_directory, *path)
 
 def repo_file(repo, *path, mkdir=False):
       """Same as repo path but create dirname(*path) if absent. For example 
@@ -68,6 +68,39 @@ def repo_dir(repo, *path, mkdir=False):
       else: 
             return None 
 
+def repo_create(path):
+      """Create a new repository at path."""
+      repo = GitRepository(path, True)
+
+      # first, we make sure the path either doesn't exist or is an
+      # empty di
+
+      if os.path.exists(repo.work_tree):
+            if not os.path.isdir(repo.work_tree):
+                  raise Exception("%s is not a directory!" % path)
+            if os.path.exists(repo.git_directory) and os.listdir(repo.git_directory):
+                  raise Exception("%s is not empty!" % path)
+      else:
+            os.makedirs(repo.work_tree)
+
+      assert repo_dir(repo, "branches", mkdir=True)
+      assert repo_dir(repo, "objects", mkdir=True)
+      assert repo_dir(repo, "refs", "tags", mkdir=False)
+      assert repo_dir(repo, "refs", "heads", mkdir=True)
+
+      # .git/description
+      with open(repo_file(repo, "description"), "w") as f:
+            f.write("Unnamed repository; edit this file 'description' to name the repository. \n")
+
+      #.git/HEAD
+      with open(repo_file(repo, "HEAD"), "w") as f:
+            f.write("ref: refs/heads/master\n")
+
+      with open(repo_file(repo, "config"), "w") as f:
+            config = repo_default_config()
+            config.write(f)
+      
+      return repo
 
 def cmd_add(args):
     print("File added")
