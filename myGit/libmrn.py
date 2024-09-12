@@ -85,7 +85,7 @@ def repo_create(path):
 
       assert repo_dir(repo, "branches", mkdir=True)
       assert repo_dir(repo, "objects", mkdir=True)
-      assert repo_dir(repo, "refs", "tags", mkdir=False)
+      assert repo_dir(repo, "refs", "tags", mkdir=True)
       assert repo_dir(repo, "refs", "heads", mkdir=True)
 
       # .git/description
@@ -101,6 +101,18 @@ def repo_create(path):
             config.write(f)
       
       return repo
+
+def repo_default_config():
+      ret = configparser.ConfigParser()
+
+      ret.add_section("core")
+      ret.set("core", "repositoryformatversion", "0")
+      ret.set("core", "filemode", "false")
+      ret.set("core", "bare", "false")
+
+      return ret
+
+
 
 def cmd_add(args):
     print("File added")
@@ -121,7 +133,8 @@ def cmd_hash_object(args):
         print("hash-object")
 
 def cmd_init(args):
-        print("init")
+      print("Creating new repo...")
+      repo_create(args.path)
 
 def cmd_log(args):
         print("log")
@@ -166,7 +179,7 @@ def main(argv=sys.argv[1:]):
     parse_cmd_checkout          = argsubparsers.add_parser("checkout", help="checkout a branch")
     parse_cmd_commit            = argsubparsers.add_parser("commit", help="commit changes to working branch")
     parse_cmd_hash_object       = argsubparsers.add_parser("hash-object", help="idk")
-    parse_cmd_init              = argsubparsers.add_parser("init", help="initialize git repo")
+    parse_cmd_init              = argsubparsers.add_parser("init", help="Initialize a new, empty repository.")
     parse_cmd_log               = argsubparsers.add_parser("log", help="show log file")
     parse_cmd_ls_files          = argsubparsers.add_parser("ls-files", help="list files")
     parse_cmd_ls_tree           = argsubparsers.add_parser("ls-tree", help="show file tree structure")
@@ -193,14 +206,26 @@ def main(argv=sys.argv[1:]):
     parse_cmd_status.set_defaults(func=cmd_status)
     parse_cmd_tag.set_defaults(func=cmd_tag)
 
+
+    # init commands arguments
+    parse_cmd_init.add_argument("path",
+                                metavar="directory",
+                                nargs="?",
+                                default=".",
+                                help="Where to create repo")
+
     # get COMMAND case for bridges function  
     args = argument_parser.parse_args(argv)
+    
+    
+    
 
-     # Call the appropriate function
+     
+    # Call the appropriate function
+    print(args)
     if hasattr(args, 'func'):
         args.func(args)  # This calls the command's function
     else:
         argument_parser.print_help()
 
 
-main()
