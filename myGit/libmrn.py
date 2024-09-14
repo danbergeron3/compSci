@@ -10,6 +10,36 @@ import zlib
 from datetime import datetime
 from fnmatch import fnmatch
 
+class GitObject(object):
+
+      def __init__(self, data=None):
+            if data != None:
+                  self.deserialize(data)
+            else:
+                  self.init()
+
+      def serialize(self, repo):
+            """This function Must be implemented by the subclass It must read the object's contents from self.data, a byte string, and do
+      whatever it takes to convert it into a meaningful representation.  What exactly that means depend on each subclass."""
+            raise Exception("Unimplemented!")
+      
+      def deserialize(self, data):
+            raise Exception("Unimplemented")
+      
+      def init(self):
+            pass # Just do nothing. This is a reasonable default!
+
+class GitBlob(GitObject):
+      fmt=b'blob'
+
+      def serialize(self):
+            return self.blobdata
+      
+      def deserialize(self, data):
+            self.blobdata = data
+
+
+
 class GitRepository (object):
         """A git repository under the hood"""
         # work tree is the git repository the user interacts with
@@ -40,7 +70,61 @@ class GitRepository (object):
                      vers = int(self.config.get("core", "repositoryformatversion"))
                      if vers != 0:
                         raise Exception("Unsupported repositoryformatversion") % vers
-        
+                     
+def object_read(repo, sha):
+      """Read object sha from Git repository repo. Return a 
+      GitObject whose exact type depends on the object."""
+      
+      path = repo_file(repo, "objects, sha[0:2], sha[2:]")
+
+      if not os.path.isfile(path):
+            return None
+      
+      with open (path, "rb") as f:
+            raw = zlib.decompress(f.read())
+
+            # Read Object type
+            x = raw.find(b' ')
+            fmt = raw[0:x]
+
+            # read and validate object size 
+            y = raw.find(b'\x00', x)
+            size = int(raw[x:y].decode("ascii"))
+            if size != len(raw)-y-1:
+                  raise Exception("Malformed object {0}: bad length".format(sha))
+            
+            # pick constructor 
+            match fmt:
+                  case b'commit' : c=GitCommit
+                  case b'tree'   : c=GitTree
+                  case b'tag'    : c=GitTag
+                  case b'blob'   : c=GitBlob
+                  case _:
+                        raise Exception("Unknown type {0} for object {1}".format(fmt.decode("ascii"), sha))
+
+        # Call constructor and return object
+      return c(raw[y+1:])
+
+def object_write(obj, repo=None):
+      # serialize object data
+      data = obj.serialize()
+      # add header 
+      result = obj.fmt + b' ' + str(len(data)).encode() + b'\x00' + data
+      # Compute Hash 
+      sha = hashlib.sha1(result).hexdigest()
+
+      if repo:
+            # compute path 
+            path=repo_file(repo, "objects", sha[0:2], sha[2:], mkdir=True)
+
+            if not os.path.exists(path):
+                  with open(path, 'wb') as f:
+                        # compress and write 
+                        f.write(zlib.compress(result))
+      return sha
+
+
+
 def repo_path(repo, *path):
       """Compute path under repo's git_directory"""
       return os.path.join(repo.git_directory, *path)
@@ -112,13 +196,21 @@ def repo_default_config():
 
       return ret
 
+def object_find(repo, name, fmt=None, follow=True):
+      return name 
+
 
 
 def cmd_add(args):
     print("File added")
 
 def cmd_cat_file(args):
-    print("file cat")
+      repo = repo_find()
+      cat_file(repo, args.object, fmt=args.type.encode())
+
+def cat_file(repo, obj, fmt=None):
+      obj = object_read(repo, object_find(repo, obj, fmt=fmt))
+      sys.stdout.buffer.write(obj.serialize())
 
 def cmd_check_ignore(args):
     print("check ignore")
@@ -140,10 +232,10 @@ def cmd_log(args):
         print("log")
 
 def cmd_ls_files(args):
-        print("ls files")
+      print("ls files")
 
 def cmd_ls_tree(args):
-        print("ls tree")
+      print("ls tree")
 
 def cmd_rev_parse(args):
         print("rev_ parse")
@@ -160,6 +252,22 @@ def cmd_status(args):
 def cmd_tag(args):
         print("tag")
 
+def repo_find(path=".", required=True):
+      path = os.path.realpath(path)
+      if os.path.isdir(os.path.join(path, ".git")):
+            return GitRepository(path)
+          
+      # if we haven't returned, recurse in parent, if w
+      parent = os.path.realpath(os.path.join(path, ".."))
+
+      if parent == path:
+            # Bottom case 
+            # os.path.join("/", "..") == "/":
+            # if parent ==path, then path is root.
+            if required:
+                  raise Exception("No git directory")
+            else:
+                  return None
 
 def main(argv=sys.argv[1:]): 
     # create parser & subparser 
@@ -213,19 +321,25 @@ def main(argv=sys.argv[1:]):
                                 nargs="?",
                                 default=".",
                                 help="Where to create repo")
+    
+    parse_cmd_cat_file.add_argument("type",
+                                    metavar="type",
+                                    choices=["blob", "commit", "tag", "tree"],
+                                    help="Specify the type")
+    
+    parse_cmd_cat_file.add_argument("object",
+                                    metavar="object",
+                                    help="The object to display")
 
+    
     # get COMMAND case for bridges function  
-    args = argument_parser.parse_args(argv)
-    
-    
-    
-
+    args = argument_parser.parse_args(argv)  
      
     # Call the appropriate function
     print(args)
     if hasattr(args, 'func'):
-        args.func(args)  # This calls the command's function
+      args.func(args)  # This calls the command's function
     else:
-        argument_parser.print_help()
+      argument_parser.print_help()
 
 
